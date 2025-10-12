@@ -4,10 +4,10 @@ import { mockPurchases } from "@/lib/mock-data";
 
 export function PurchaseStats() {
   const totalPurchases = mockPurchases.length;
-  const completedPurchases = mockPurchases.filter(p => p.status === 'completed').length;
-  const pendingPurchases = mockPurchases.filter(p => p.status === 'pending').length;
+  const completedPurchases = mockPurchases.filter(p => p.status === 'ACTIVE').length;
+  const pendingPurchases = mockPurchases.filter(p => p.status === 'PENDING').length;
   const totalRevenue = mockPurchases
-    .filter(p => p.status === 'completed')
+    .filter(p => p.status === 'ACTIVE')
     .reduce((sum, p) => sum + p.amount, 0);
 
   const stats = [

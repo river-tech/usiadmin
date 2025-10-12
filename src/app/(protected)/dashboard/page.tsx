@@ -1,6 +1,4 @@
 import { MetricsCards } from "@/components/dashboard/MetricsCards";
-import { SalesChart } from "@/components/dashboard/SalesChart";
-import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { RecentPurchases } from "@/components/dashboard/RecentPurchases";
 
 export default function DashboardPage() {
@@ -16,12 +14,6 @@ export default function DashboardPage() {
 
       {/* Metrics Cards */}
       <MetricsCards />
-
-      {/* Charts and Activity */}
-      <div className="grid gap-6 md:grid-cols-2">
-        <SalesChart />
-        <RecentActivity />
-      </div>
 
       {/* Recent Purchases */}
       <RecentPurchases />

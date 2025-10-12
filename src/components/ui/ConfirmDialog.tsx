@@ -45,7 +45,7 @@ export function ConfirmDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white border shadow-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {variant === 'destructive' && (
@@ -66,7 +66,7 @@ export function ConfirmDialog({
             {cancelText}
           </Button>
           <Button
-            variant={variant === 'destructive' ? 'destructive' : 'default'}
+            variant={variant === 'destructive' ? 'destructive-red' : 'default'}
             onClick={handleConfirm}
             disabled={isLoading}
           >

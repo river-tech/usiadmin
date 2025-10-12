@@ -6,56 +6,56 @@ export const mockUsers: User[] = [
     id: '1',
     name: 'John Doe',
     email: 'john.doe@example.com',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
+    avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
     joinDate: '2024-01-15',
     purchases: 5,
     totalSpent: 299.95,
     status: 'active',
-    lastActive: '2024-01-20T10:30:00Z'
+    is_banned: false // Map to is_deleted: false = not banned
   },
   {
     id: '2',
     name: 'Jane Smith',
     email: 'jane.smith@example.com',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
+    avatar_url: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
     joinDate: '2024-01-10',
     purchases: 3,
     totalSpent: 179.97,
     status: 'active',
-    lastActive: '2024-01-19T14:20:00Z'
+    is_banned: false // Map to is_deleted: false = not banned
   },
   {
     id: '3',
     name: 'Mike Johnson',
     email: 'mike.johnson@example.com',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
     joinDate: '2024-01-05',
     purchases: 8,
     totalSpent: 479.92,
     status: 'active',
-    lastActive: '2024-01-20T09:15:00Z'
+    is_banned: false // Map to is_deleted: false = not banned
   },
   {
     id: '4',
     name: 'Sarah Wilson',
     email: 'sarah.wilson@example.com',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face',
+    avatar_url: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=32&h=32&fit=crop&crop=face',
     joinDate: '2023-12-20',
     purchases: 2,
     totalSpent: 119.98,
     status: 'inactive',
-    lastActive: '2024-01-10T16:45:00Z'
+    is_banned: true // Map to is_deleted: true = banned
   },
   {
     id: '5',
     name: 'David Brown',
     email: 'david.brown@example.com',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face',
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=32&h=32&fit=crop&crop=face',
     joinDate: '2024-01-18',
     purchases: 1,
     totalSpent: 59.99,
     status: 'active',
-    lastActive: '2024-01-20T11:30:00Z'
+    is_banned: false // Map to is_deleted: false = not banned
   }
 ];
 
@@ -71,9 +71,11 @@ export const mockWorkflows: Workflow[] = [
     revenue: 4499.55,
     created: '2024-01-01',
     updated: '2024-01-15',
-    status: 'published',
-    tags: ['automation', 'ecommerce', 'inventory'],
-    previewImage: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=300&h=200&fit=crop'
+    status: 'active',
+    features: ['automation', 'ecommerce', 'inventory'],
+    jsonData: '{"steps": [{"id": 1, "name": "Inventory Check", "type": "condition"}, {"id": 2, "name": "Process Order", "type": "action"}]}',
+    timeToSetup: 30,
+    videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '2',
@@ -85,9 +87,11 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2559.68,
     created: '2024-01-05',
     updated: '2024-01-18',
-    status: 'published',
-    tags: ['social', 'automation', 'scheduling'],
-    previewImage: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=300&h=200&fit=crop'
+    status: 'active',
+    features: ['social', 'automation', 'scheduling'],
+    jsonData: '{"steps": [{"id": 1, "name": "Content Creation", "type": "action"}, {"id": 2, "name": "Schedule Post", "type": "action"}]}',
+    timeToSetup: 45,
+    videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '3',
@@ -99,9 +103,11 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2699.82,
     created: '2024-01-08',
     updated: '2024-01-20',
-    status: 'published',
-    tags: ['analytics', 'data', 'visualization'],
-    previewImage: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=300&h=200&fit=crop'
+    status: 'active',
+    features: ['analytics', 'data', 'visualization'],
+    jsonData: '{"steps": [{"id": 1, "name": "Data Collection", "type": "action"}, {"id": 2, "name": "Process Data", "type": "action"}]}',
+    timeToSetup: 60,
+    videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '4',
@@ -113,9 +119,11 @@ export const mockWorkflows: Workflow[] = [
     revenue: 3249.75,
     created: '2024-01-12',
     updated: '2024-01-19',
-    status: 'published',
-    tags: ['ai', 'support', 'automation'],
-    previewImage: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=300&h=200&fit=crop'
+    status: 'active',
+    features: ['ai', 'support', 'automation'],
+    jsonData: '{"steps": [{"id": 1, "name": "Ticket Analysis", "type": "ai"}, {"id": 2, "name": "Generate Response", "type": "ai"}]}',
+    timeToSetup: 90,
+    videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
   },
   {
     id: '5',
@@ -127,9 +135,11 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2519.72,
     created: '2024-01-14',
     updated: '2024-01-20',
-    status: 'draft',
-    tags: ['email', 'marketing', 'automation'],
-    previewImage: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=300&h=200&fit=crop'
+    status: 'expired',
+    features: ['email', 'marketing', 'automation'],
+    jsonData: '{"steps": [{"id": 1, "name": "Segment Audience", "type": "action"}, {"id": 2, "name": "Send Email", "type": "action"}]}',
+    timeToSetup: 20,
+    videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
   }
 ];
 
@@ -144,8 +154,8 @@ export const mockPurchases: Purchase[] = [
     workflowTitle: 'E-commerce Automation',
     amount: 99.99,
     date: '2024-01-20T10:30:00Z',
-    paymentMethod: 'stripe',
-    status: 'completed',
+    paymentMethod: 'QR',
+    status: 'ACTIVE',
     transactionId: 'txn_123456789'
   },
   {
@@ -157,8 +167,8 @@ export const mockPurchases: Purchase[] = [
     workflowTitle: 'Social Media Manager',
     amount: 79.99,
     date: '2024-01-19T14:20:00Z',
-    paymentMethod: 'stripe',
-    status: 'completed',
+    paymentMethod: 'QR',
+    status: 'ACTIVE',
     transactionId: 'txn_123456790'
   },
   {
@@ -170,8 +180,8 @@ export const mockPurchases: Purchase[] = [
     workflowTitle: 'Data Analytics Pipeline',
     amount: 149.99,
     date: '2024-01-18T09:15:00Z',
-    paymentMethod: 'stripe',
-    status: 'completed',
+    paymentMethod: 'QR',
+    status: 'ACTIVE',
     transactionId: 'txn_123456791'
   },
   {
@@ -183,8 +193,8 @@ export const mockPurchases: Purchase[] = [
     workflowTitle: 'Customer Support Bot',
     amount: 129.99,
     date: '2024-01-17T16:45:00Z',
-    paymentMethod: 'stripe',
-    status: 'pending',
+    paymentMethod: 'QR',
+    status: 'PENDING',
     transactionId: 'txn_123456792'
   },
   {
@@ -196,8 +206,8 @@ export const mockPurchases: Purchase[] = [
     workflowTitle: 'E-commerce Automation',
     amount: 99.99,
     date: '2024-01-16T11:30:00Z',
-    paymentMethod: 'stripe',
-    status: 'completed',
+    paymentMethod: 'QR',
+    status: 'REJECT',
     transactionId: 'txn_123456793'
   }
 ];
@@ -339,6 +349,6 @@ export const getRecentPurchases = (limit: number = 5) =>
 
 export const getTopWorkflows = (limit: number = 5) => 
   mockWorkflows
-    .filter(w => w.status === 'published')
+    .filter(w => w.status === 'active')
     .sort((a, b) => b.sales - a.sales)
     .slice(0, limit);

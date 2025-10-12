@@ -12,7 +12,7 @@ import {
   Users,
   ShoppingCart,
   Settings,
-  FileText,
+  Bell,
   // BarChart3,
   Menu,
   X,
@@ -42,15 +42,16 @@ const navigation = [
     icon: ShoppingCart,
   },
   {
-    title: "Settings",
+    title: "Account Management",
     href: "/settings",
     icon: Settings,
   },
-  {
-    title: "Logs",
-    href: "/logs",
-    icon: FileText,
-  },
+      {
+        title: "Notifications & Logs",
+        href: "/notifications",
+        icon: Bell,
+        badge: "3"
+      },
   // {
   //   title: "Analytics",
   //   href: "/analytics",

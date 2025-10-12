@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { CategoryBadge } from "@/components/ui/CategoryBadge";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import {
   Table,
@@ -23,8 +24,10 @@ import { MoreHorizontal, Edit, Eye, Trash2, Upload } from "lucide-react";
 import { mockWorkflows } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import { useAlert } from "@/contexts/AlertContext";
 
 export function WorkflowTable() {
+  const { showSuccess, showError } = useAlert();
   const [workflows] = useState(mockWorkflows);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteDialog, setDeleteDialog] = useState<{
@@ -42,9 +45,14 @@ export function WorkflowTable() {
   };
 
   const confirmDelete = () => {
-    // In a real app, you'd make an API call here
-    console.log("Deleting workflow:", deleteDialog.workflow?.id);
-    setDeleteDialog({ open: false, workflow: null });
+    try {
+      // In a real app, you'd make an API call here
+      console.log("Deleting workflow:", deleteDialog.workflow?.id);
+      setDeleteDialog({ open: false, workflow: null });
+      showSuccess("Success", `Workflow "${deleteDialog.workflow?.title}" deleted successfully!`);
+    } catch (error) {
+      showError("Error", "Failed to delete workflow. Please try again.");
+    }
   };
 
   return (
@@ -59,7 +67,7 @@ export function WorkflowTable() {
             className="w-80"
           />
         </div>
-        <Button className="btn-gradient" asChild>
+        <Button className="btn-gradient cursor-pointer" asChild>
           <Link href="/workflows/upload">
             <Upload className="h-4 w-4 mr-2" />
             Upload Workflow
@@ -93,9 +101,7 @@ export function WorkflowTable() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {workflow.category}
-                  </span>
+                  <CategoryBadge category={workflow.category} className="text-xs px-2.5 py-0.5" />
                 </TableCell>
                 <TableCell className="font-medium">
                   ${workflow.price}
@@ -112,23 +118,25 @@ export function WorkflowTable() {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent className="bg-white border shadow-lg z-50" align="end">
                       <DropdownMenuItem asChild>
                         <Link href={`/workflows/${workflow.id}/edit`}>
                           <Edit className="mr-2 h-4 w-4" />
                           Edit
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
+                      <DropdownMenuItem asChild>
+                        <Link href={`/workflows/${workflow.id}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        className="text-destructive"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                         onClick={() => handleDelete(workflow)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />

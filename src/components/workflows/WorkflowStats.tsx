@@ -3,7 +3,7 @@ import { Workflow, DollarSign, TrendingUp, Users } from "lucide-react";
 import { mockWorkflows, mockAnalytics } from "@/lib/mock-data";
 
 export function WorkflowStats() {
-  const publishedWorkflows = mockWorkflows.filter(w => w.status === 'published');
+  const publishedWorkflows = mockWorkflows.filter(w => w.status === 'active');
   const totalRevenue = publishedWorkflows.reduce((sum, w) => sum + w.revenue, 0);
   const totalSales = publishedWorkflows.reduce((sum, w) => sum + w.sales, 0);
 
@@ -15,10 +15,10 @@ export function WorkflowStats() {
       description: "All workflows in system"
     },
     {
-      title: "Published",
+      title: "Active",
       value: publishedWorkflows.length,
       icon: <TrendingUp className="h-4 w-4" />,
-      description: "Currently published"
+      description: "Currently active"
     },
     {
       title: "Total Sales",

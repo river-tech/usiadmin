@@ -21,8 +21,10 @@ import {
 import { MoreHorizontal, Eye, Download, Filter } from "lucide-react";
 import { mockPurchases } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
+import { useAlert } from "@/contexts/AlertContext";
 
 export function PurchaseTable() {
+  const { showSuccess, showError } = useAlert();
   const [purchases] = useState(mockPurchases);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -56,21 +58,18 @@ export function PurchaseTable() {
                 {statusFilter === "all" ? "All Status" : statusFilter}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="bg-white border shadow-lg z-50">
               <DropdownMenuItem onClick={() => setStatusFilter("all")}>
                 All Status
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("completed")}>
+              <DropdownMenuItem onClick={() => setStatusFilter("ACTIVE")}>
                 Completed
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("pending")}>
+              <DropdownMenuItem onClick={() => setStatusFilter("PENDING")}>
                 Pending
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("failed")}>
-                Failed
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setStatusFilter("refunded")}>
-                Refunded
+              <DropdownMenuItem onClick={() => setStatusFilter("REJECT")}>
+                Rejected
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -128,11 +127,11 @@ export function PurchaseTable() {
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
+                      <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent className="bg-white border shadow-lg z-50" align="end">
                       <DropdownMenuItem>
                         <Eye className="mr-2 h-4 w-4" />
                         View Details

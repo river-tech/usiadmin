@@ -3,12 +3,12 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  avatar?: string;
+  avatar_url?: string;
   joinDate: string;
   purchases: number;
   totalSpent: number;
-  status: 'active' | 'inactive' | 'suspended';
-  lastActive: string;
+  status: 'active' | 'inactive'; // Map to is_deleted: false = active, true = inactive
+  is_banned?: boolean; // Map to is_deleted: true = banned, false = not banned
 }
 
 // Workflow types
@@ -22,10 +22,12 @@ export interface Workflow {
   revenue: number;
   created: string;
   updated: string;
-  status: 'draft' | 'published' | 'unpublished';
-  tags: string[];
-  previewImage?: string;
-  jsonData?: string;
+  status: 'active' | 'expired'; // Use database enum values
+  features: string[]; // Map to features array
+  jsonData?: string; // Map to flow jsonb
+  timeToSetup?: number; // Map to time_to_setup
+  videoDemo?: string; // Map to video_demo
+  // previewImage sẽ được lấy từ workflow_assets table với kind = 'image'
 }
 
 // Purchase types
@@ -38,9 +40,9 @@ export interface Purchase {
   workflowTitle: string;
   amount: number;
   date: string;
-  paymentMethod: 'stripe' | 'paypal' | 'bank_transfer';
-  status: 'completed' | 'pending' | 'failed' | 'refunded';
-  transactionId: string;
+  paymentMethod: 'QR'; // Use database enum value
+  status: 'ACTIVE' | 'PENDING' | 'REJECT'; // Use database enum values
+  transactionId: string; // Map to transfer_code
 }
 
 // Activity/Log types
@@ -129,7 +131,7 @@ export interface StatCardProps {
 }
 
 export interface StatusBadgeProps {
-  status: 'active' | 'inactive' | 'pending' | 'completed' | 'draft' | 'published' | 'unpublished' | 'suspended' | 'failed' | 'refunded';
+  status: 'active' | 'inactive' | 'ACTIVE' | 'PENDING' | 'REJECT' | 'expired';
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
 }
 
@@ -156,7 +158,7 @@ export interface WorkflowFormData {
 export interface UserFormData {
   name: string;
   email: string;
-  status: 'active' | 'inactive' | 'suspended';
+  status: 'active' | 'inactive'; // Map to is_deleted
 }
 
 // Filter types

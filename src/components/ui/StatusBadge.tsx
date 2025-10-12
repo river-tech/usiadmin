@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface StatusBadgeProps {
-  status: 'active' | 'inactive' | 'pending' | 'completed' | 'draft' | 'published' | 'unpublished' | 'suspended' | 'failed' | 'refunded';
+  status: 'active' | 'inactive' | 'ACTIVE' | 'PENDING' | 'REJECT' | 'expired';
   variant?: 'default' | 'secondary' | 'destructive' | 'outline';
   className?: string;
 }
@@ -10,14 +10,10 @@ interface StatusBadgeProps {
 const statusConfig = {
   active: { label: 'Active', className: 'status-active' },
   inactive: { label: 'Inactive', className: 'status-inactive' },
-  pending: { label: 'Pending', className: 'status-pending' },
-  completed: { label: 'Completed', className: 'status-completed' },
-  draft: { label: 'Draft', className: 'status-draft' },
-  published: { label: 'Published', className: 'status-published' },
-  unpublished: { label: 'Unpublished', className: 'status-unpublished' },
-  suspended: { label: 'Suspended', className: 'status-suspended' },
-  failed: { label: 'Failed', className: 'status-failed' },
-  refunded: { label: 'Refunded', className: 'status-refunded' }
+  ACTIVE: { label: 'Completed', className: 'status-completed' },
+  PENDING: { label: 'Pending', className: 'status-pending' },
+  REJECT: { label: 'Rejected', className: 'status-failed' },
+  expired: { label: 'Expired', className: 'status-unpublished' }
 };
 
 export function StatusBadge({ status, variant = 'default', className }: StatusBadgeProps) {

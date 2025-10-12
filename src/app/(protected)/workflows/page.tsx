@@ -11,14 +11,14 @@ export default function WorkflowsPage() {
       <PageHeader
         title="Workflows"
         description="Manage and track your workflow automation templates"
-        children={
-          <Button className="btn-gradient" asChild>
-            <Link href="/workflows/upload">
-              <Upload className="h-4 w-4 mr-2" />
-              Upload Workflow
-            </Link>
-          </Button>
-        }
+        // children={
+        //   <Button className="btn-gradient" asChild>
+        //     <Link href="/workflows/upload">
+        //       <Upload className="h-4 w-4 mr-2" />
+        //       Upload Workflow
+        //     </Link>
+        //   </Button>
+        // }
       />
 
       <WorkflowStats />
