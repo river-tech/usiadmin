@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  LayoutDashboard,
   Workflow,
   Users,
   ShoppingCart,
   Settings,
+  FolderTree,
   Bell,
   // BarChart3,
   Menu,
@@ -21,15 +21,15 @@ import {
 
 const navigation = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
     title: "Workflows",
     href: "/workflows",
     icon: Workflow,
     badge: "5"
+  },
+  {
+    title: "Categories",
+    href: "/categories",
+    icon: FolderTree,
   },
   {
     title: "Users",
@@ -132,7 +132,7 @@ export function Sidebar({ className }: SidebarProps) {
         <div className="p-4 border-t border-white/10">
           <div className="text-xs text-white/70">
             <p>Secure Admin Portal</p>
-            <p>2FA Enabled</p>
+            <p>Secure Access</p>
           </div>
         </div>
       )}

@@ -23,7 +23,7 @@ export interface Workflow {
   created: string;
   updated: string;
   status: 'active' | 'expired'; // Use database enum values
-  features: string[]; // Map to features array
+  categories: string[]; // Map to categories array
   jsonData?: string; // Map to flow jsonb
   timeToSetup?: number; // Map to time_to_setup
   videoDemo?: string; // Map to video_demo
@@ -150,7 +150,7 @@ export interface WorkflowFormData {
   description: string;
   category: string;
   price: number;
-  tags: string[];
+  categories: string[];
   previewImage?: File;
   jsonData?: string;
 }

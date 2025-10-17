@@ -19,7 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Download, Mail, Ban } from "lucide-react";
+import { MoreHorizontal, Eye, Mail, Ban } from "lucide-react";
+import Link from "next/link";
 import { mockUsers } from "@/lib/mock-data";
 import { formatDistanceToNow } from "date-fns";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
@@ -71,10 +72,6 @@ export function UserTable() {
             className="w-80"
           />
         </div>
-        <Button variant="outline">
-          <Download className="h-4 w-4 mr-2" />
-          Export CSV
-        </Button>
       </div>
 
       {/* Table */}
@@ -138,9 +135,11 @@ export function UserTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-white border shadow-lg z-50" align="end">
-                      <DropdownMenuItem>
-                        <Eye className="mr-2 h-4 w-4" />
-                        View Profile
+                      <DropdownMenuItem asChild>
+                        <Link href={`/users/${user.id}`}>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Profile
+                        </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Mail className="mr-2 h-4 w-4" />

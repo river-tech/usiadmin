@@ -11,28 +11,45 @@ import {
   Edit, 
   Trash2, 
   Download, 
-  Eye, 
-  Clock, 
   DollarSign, 
-  Tag, 
-  Calendar,
   Play,
   Star,
   Users
 } from "lucide-react";
 import Link from "next/link";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 
-interface WorkflowDetailPageProps {
-  params: {
-    id: string;
-  };
-}
-
-export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) {
-  const workflow = mockWorkflows.find(w => w.id === params.id);
+export default function WorkflowDetailPage() {
+  const params = useParams();
+  const [workflow, setWorkflow] = useState<any>(null);
   const [deleteDialog, setDeleteDialog] = useState(false);
+
+  useEffect(() => {
+    const found = mockWorkflows.find(w => w.id === params.id);
+    if (!found) {
+      setWorkflow(null);
+      return;
+    }
+    const normalized: any = {
+      id: found.id,
+      title: found.title,
+      description: found.description,
+      price: found.price,
+      status: found.status,
+      // features may be named categories in older mocks
+      categories: found.categories || [],
+      timeToSetup: found.timeToSetup ?? 0,
+      videoDemo: found.videoDemo ?? "",
+      jsonData: found.jsonData ?? {},
+      sales: found.sales ?? 0,
+      revenue: found.revenue ?? 0,
+      created: found.created ?? new Date().toISOString(),
+      updated: found.updated ?? new Date().toISOString()
+    };
+    setWorkflow(normalized);
+  }, [params.id]);
 
   if (!workflow) {
     return (
@@ -99,9 +116,15 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
                   <p className="text-sm">{workflow.title}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Category</label>
-                  <div className="mt-1">
-                    <CategoryBadge category={workflow.category} />
+                  <label className="text-sm font-medium text-muted-foreground">Categories</label>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {workflow.categories?.length > 0 ? (
+                      workflow.categories.map((c: {id: string; name: string}) => (
+                        <Badge key={c.id} variant="secondary">{c.name}</Badge>
+                      ))
+                    ) : (
+                      <span className="text-sm text-muted-foreground">No categories</span>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -114,6 +137,18 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
                   <label className="text-sm font-medium text-muted-foreground">Price</label>
                   <p className="text-sm font-medium">${workflow.price}</p>
                 </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Time to Setup</label>
+                  <p className="text-sm">{workflow.time_to_setup} minutes</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-muted-foreground">Video Demo</label>
+                  {workflow.video_demo ? (
+                    <a href={workflow.video_demo} target="_blank" rel="noreferrer" className="text-blue-600 underline text-sm">Open video</a>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No video</p>
+                  )}
+                </div>
               </div>
               
               <div>
@@ -122,20 +157,21 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
               </div>
 
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Tags</label>
+                <label className="text-sm font-medium text-muted-foreground">Features</label>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {workflow.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary">
-                      <Tag className="h-3 w-3 mr-1" />
-                      {tag}
-                    </Badge>
-                  ))}
+                  {workflow.features?.length > 0 ? (
+                    workflow.features.map((f: string, idx: number) => (
+                      <Badge key={`${f}-${idx}`} variant="secondary">{f}</Badge>
+                    ))
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No features</span>
+                  )}
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* JSON Data Preview */}
+          {/* JSON Flow Preview */}
           <Card>
             <CardHeader>
               <CardTitle>Workflow Configuration</CardTitle>
@@ -146,9 +182,37 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
             <CardContent>
               <div className="bg-muted rounded-lg p-4">
                 <pre className="text-xs overflow-x-auto">
-                  {workflow.jsonData || "No JSON data available"}
+                  {JSON.stringify(workflow.flow, null, 2) || "No JSON data available"}
                 </pre>
               </div>
+            </CardContent>
+          </Card>
+
+          {/* Assets */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Assets</CardTitle>
+              <CardDescription>Images, videos or documents attached to this workflow</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {workflow.assets?.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {workflow.assets.map((a: {id: string; asset_url: string; kind: string}) => (
+                    <div key={a.id} className="border rounded-lg overflow-hidden">
+                      {a.kind === 'image' ? (
+                        <img src={a.asset_url} alt="asset" className="w-full h-40 object-cover" />
+                      ) : (
+                        <div className="p-4 text-sm">{a.kind.toUpperCase()}</div>
+                      )}
+                      <div className="p-3 text-xs truncate">
+                        <a href={a.asset_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">{a.asset_url}</a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No assets</p>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -196,7 +260,7 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
                 <div>
                   <p className="text-sm font-medium">Created</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(workflow.created), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(workflow.created_at), { addSuffix: true })}
                   </p>
                 </div>
               </div>
@@ -205,7 +269,7 @@ export default function WorkflowDetailPage({ params }: WorkflowDetailPageProps) 
                 <div>
                   <p className="text-sm font-medium">Last Updated</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatDistanceToNow(new Date(workflow.updated), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(workflow.updated_at), { addSuffix: true })}
                   </p>
                 </div>
               </div>

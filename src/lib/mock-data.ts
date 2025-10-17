@@ -72,7 +72,7 @@ export const mockWorkflows: Workflow[] = [
     created: '2024-01-01',
     updated: '2024-01-15',
     status: 'active',
-    features: ['automation', 'ecommerce', 'inventory'],
+    categories: ['automation', 'ecommerce', 'inventory'],
     jsonData: '{"steps": [{"id": 1, "name": "Inventory Check", "type": "condition"}, {"id": 2, "name": "Process Order", "type": "action"}]}',
     timeToSetup: 30,
     videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
@@ -88,7 +88,7 @@ export const mockWorkflows: Workflow[] = [
     created: '2024-01-05',
     updated: '2024-01-18',
     status: 'active',
-    features: ['social', 'automation', 'scheduling'],
+    categories: ['social', 'automation', 'scheduling'],
     jsonData: '{"steps": [{"id": 1, "name": "Content Creation", "type": "action"}, {"id": 2, "name": "Schedule Post", "type": "action"}]}',
     timeToSetup: 45,
     videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
@@ -104,7 +104,7 @@ export const mockWorkflows: Workflow[] = [
     created: '2024-01-08',
     updated: '2024-01-20',
     status: 'active',
-    features: ['analytics', 'data', 'visualization'],
+    categories: ['analytics', 'data', 'visualization'],
     jsonData: '{"steps": [{"id": 1, "name": "Data Collection", "type": "action"}, {"id": 2, "name": "Process Data", "type": "action"}]}',
     timeToSetup: 60,
     videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
@@ -120,7 +120,7 @@ export const mockWorkflows: Workflow[] = [
     created: '2024-01-12',
     updated: '2024-01-19',
     status: 'active',
-    features: ['ai', 'support', 'automation'],
+    categories: ['ai', 'support', 'automation'],
     jsonData: '{"steps": [{"id": 1, "name": "Ticket Analysis", "type": "ai"}, {"id": 2, "name": "Generate Response", "type": "ai"}]}',
     timeToSetup: 90,
     videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'
@@ -136,7 +136,7 @@ export const mockWorkflows: Workflow[] = [
     created: '2024-01-14',
     updated: '2024-01-20',
     status: 'expired',
-    features: ['email', 'marketing', 'automation'],
+    categories: ['email', 'marketing', 'automation'],
     jsonData: '{"steps": [{"id": 1, "name": "Segment Audience", "type": "action"}, {"id": 2, "name": "Send Email", "type": "action"}]}',
     timeToSetup: 20,
     videoDemo: 'https://youtube.com/watch?v=dQw4w9WgXcQ'

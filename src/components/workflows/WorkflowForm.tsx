@@ -24,11 +24,13 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
     description: initialData?.description || "",
     category: initialData?.category || "",
     price: initialData?.price || "",
-    features: initialData?.features || [],
+    categories: initialData?.categories || [],
     jsonData: initialData?.jsonData || "",
     previewImage: null as File | null,
     timeToSetup: initialData?.timeToSetup || "",
-    videoDemo: initialData?.videoDemo || ""
+    // media uploads
+    imageFile: null as File | null,
+    videoFile: null as File | null
   });
   const [newFeature, setNewFeature] = useState("");
 
@@ -36,20 +38,20 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addFeature = () => {
-    if (newFeature.trim() && !formData.features.includes(newFeature.trim())) {
+  const addCategory = () => {
+    if (newFeature.trim() && !formData.categories.includes(newFeature.trim())) {
       setFormData(prev => ({
         ...prev,
-        features: [...prev.features, newFeature.trim()]
+        categories: [...prev.categories, newFeature.trim()]
       }));
       setNewFeature("");
     }
   };
 
-  const removeFeature = (featureToRemove: string) => {
+  const removeCategory = (categoryToRemove: string) => {
     setFormData(prev => ({
       ...prev,
-      features: prev.features.filter((feature: string) => feature !== featureToRemove)
+      categories: prev.categories.filter((category: string) => category !== categoryToRemove)
     }));
   };
 
@@ -80,6 +82,21 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
     }
   };
 
+  const handleMediaUpload = (event: React.ChangeEvent<HTMLInputElement>, kind: 'image' | 'video') => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (kind === 'image' && !file.type.startsWith('image/')) {
+      showError("Error", "Please upload a valid image file");
+      return;
+    }
+    if (kind === 'video' && !file.type.startsWith('video/')) {
+      showError("Error", "Please upload a valid video file");
+      return;
+    }
+    setFormData(prev => ({ ...prev, [kind === 'image' ? 'imageFile' : 'videoFile']: file }));
+    showSuccess("Success", `${kind === 'image' ? 'Image' : 'Video'} selected`);
+  };
+
   const handleSubmit = () => {
     try {
       console.log("Submitting workflow:", formData);
@@ -92,8 +109,8 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
 
   const steps = [
     { id: 1, title: "Upload JSON", description: "Upload your workflow JSON file" },
-    { id: 2, title: "Details", description: "Add title, description, and category" },
-    { id: 3, title: "Pricing & Features", description: "Set price and add features" },
+    { id: 2, title: "Details", description: "Add title, description, and feature" },
+    { id: 3, title: "Pricing & Categories", description: "Set price and add categories" },
     { id: 4, title: "Preview", description: "Review and publish" }
   ];
 
@@ -143,11 +160,16 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
         <CardContent>
           <Tabs value={currentStep.toString()} onValueChange={(value) => setCurrentStep(parseInt(value))}>
             <TabsList className="grid w-full grid-cols-4 bg-gray-100 p-1 rounded-lg">
-              {steps.map((step) => (
+              {steps.map((step, index) => (
                 <TabsTrigger 
                   key={step.id} 
                   value={step.id.toString()}
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
+                  className={`data-[state=active]:bg-gradient-to-r data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200 ${
+                    index === 0 ? 'data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600' :
+                    index === 1 ? 'data-[state=active]:from-green-500 data-[state=active]:to-emerald-600' :
+                    index === 2 ? 'data-[state=active]:from-purple-500 data-[state=active]:to-pink-600' :
+                    'data-[state=active]:from-orange-500 data-[state=active]:to-red-600'
+                  }`}
                 >
                   {step.title}
                 </TabsTrigger>
@@ -220,21 +242,40 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
                   />
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="category" className="text-sm font-semibold text-gray-700">
-                    Category
+                  <label htmlFor="feature" className="text-sm font-semibold text-gray-700">
+                    Feature
                   </label>
-                  <Input
-                    id="category"
-                    value={formData.category}
-                    onChange={(e) => handleInputChange("category", e.target.value)}
-                    placeholder="e.g., E-commerce, Marketing, Analytics"
-                    className="border-blue-200 focus:border-blue-400 focus:ring-blue-100"
-                  />
+                  <div className="flex gap-2">
+                    <Input
+                      id="feature"
+                      value={newFeature}
+                      onChange={(e) => setNewFeature(e.target.value)}
+                      placeholder="Add a feature"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
+                      className="border-blue-200 focus:border-blue-400 focus:ring-blue-100"
+                    />
+                    <Button type="button" onClick={addCategory} size="icon" className="bg-blue-500 hover:bg-blue-600 text-white">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  {formData.categories.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {formData.categories.map((category: string) => (
+                        <Badge key={category} className="flex items-center gap-1 bg-blue-50 text-blue-800 border border-blue-200">
+                          {category}
+                          <X
+                            className="h-3 w-3 cursor-pointer hover:text-red-500"
+                            onClick={() => removeCategory(category)}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </TabsContent>
 
-            {/* Step 3: Pricing & Tags */}
+            {/* Step 3: Pricing & Categories */}
             <TabsContent value="3" className="space-y-4">
               <div className="grid gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -267,40 +308,65 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
                     />
                   </div>
                 </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="videoDemo" className="text-sm font-semibold text-gray-700">
-                    Video Demo URL
-                  </label>
-                  <Input
-                    id="videoDemo"
-                    type="url"
-                    value={formData.videoDemo}
-                    onChange={(e) => handleInputChange("videoDemo", e.target.value)}
-                    placeholder="https://youtube.com/watch?v=..."
-                    className="border-orange-200 focus:border-orange-400 focus:ring-orange-100"
-                  />
+                  <label className="text-sm font-semibold text-gray-700">Upload Image</label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="image-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleMediaUpload(e, 'image')}
+                      className="border-orange-200 focus:border-orange-400 focus:ring-orange-100"
+                    />
+                  </div>
+                  {formData.imageFile && (
+                    <div className="text-xs text-gray-600 flex items-center gap-2">
+                      <span>{formData.imageFile.name}</span>
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => setFormData(prev => ({...prev, imageFile: null}))} />
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">Features</label>
+                  <label className="text-sm font-semibold text-gray-700">Upload Video</label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="video-upload"
+                      type="file"
+                      accept="video/*"
+                      onChange={(e) => handleMediaUpload(e, 'video')}
+                      className="border-orange-200 focus:border-orange-400 focus:ring-orange-100"
+                    />
+                  </div>
+                  {formData.videoFile && (
+                    <div className="text-xs text-gray-600 flex items-center gap-2">
+                      <span>{formData.videoFile.name}</span>
+                      <X className="h-3 w-3 cursor-pointer" onClick={() => setFormData(prev => ({...prev, videoFile: null}))} />
+                    </div>
+                  )}
+                </div>
+              </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-semibold text-gray-700">Categories</label>
                   <div className="flex gap-2">
                     <Input
                       value={newFeature}
                       onChange={(e) => setNewFeature(e.target.value)}
-                      placeholder="Add a feature"
-                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
+                      placeholder="Add a category"
+                      onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCategory())}
                       className="border-pink-200 focus:border-pink-400 focus:ring-pink-100"
                     />
-                    <Button type="button" onClick={addFeature} size="icon" className="bg-pink-500 hover:bg-pink-600 text-white">
+                    <Button type="button" onClick={addCategory} size="icon" className="bg-pink-500 hover:bg-pink-600 text-white">
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {formData.features.map((feature: string) => (
-                      <Badge key={feature} className="flex items-center gap-1 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-800 border border-pink-200 hover:from-pink-200 hover:to-purple-200">
-                        {feature}
+                    {formData.categories.map((category: string) => (
+                      <Badge key={category} className="flex items-center gap-1 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-800 border border-pink-200 hover:from-pink-200 hover:to-purple-200">
+                        {category}
                         <X
                           className="h-3 w-3 cursor-pointer hover:text-red-500"
-                          onClick={() => removeFeature(feature)}
+                          onClick={() => removeCategory(category)}
                         />
                       </Badge>
                     ))}
@@ -325,19 +391,24 @@ export function WorkflowForm({ isEdit = false, initialData }: WorkflowFormProps)
                     <span className="font-medium">Setup Time:</span>
                     <span>{formData.timeToSetup} minutes</span>
                   </div>
-                  {formData.videoDemo && (
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="font-medium">Video Demo:</span>
-                      <a href={formData.videoDemo} target="_blank" rel="noopener noreferrer" 
-                         className="text-blue-600 hover:underline">
-                        Watch Demo
-                      </a>
+                  {(formData.imageFile || formData.videoFile) && (
+                    <div className="flex items-center gap-4 text-sm">
+                      {formData.imageFile && (
+                        <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                          Image: {formData.imageFile.name}
+                        </span>
+                      )}
+                      {formData.videoFile && (
+                        <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200">
+                          Video: {formData.videoFile.name}
+                        </span>
+                      )}
                     </div>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    {formData.features.map((feature: string) => (
-                      <Badge key={feature} variant="secondary">
-                        {feature}
+                    {formData.categories.map((category: string) => (
+                      <Badge key={category} variant="secondary">
+                        {category}
                       </Badge>
                     ))}
                   </div>

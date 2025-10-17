@@ -89,14 +89,14 @@ export function Header({ className }: HeaderProps) {
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 z-50 bg-white border shadow-lg" align="end" forceMount>
+          <DropdownMenuContent className="w-64 z-50 bg-white border shadow-xl rounded-xl p-2" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Admin User</p>
+              <div className="flex flex-col space-y-1 px-1 py-1">
+                <p className="text-sm font-semibold leading-none">Admin User</p>
                 <p className="text-xs leading-none text-muted-foreground">
                   admin@usitech.io.vn
                 </p>
-                <Badge variant="secondary" className="w-fit mt-1">
+                <Badge variant="secondary" className="w-fit mt-2 rounded-full px-3 py-1">
                   <Shield className="h-3 w-3 mr-1" />
                   ADMIN
                 </Badge>

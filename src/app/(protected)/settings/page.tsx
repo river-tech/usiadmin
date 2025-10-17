@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserPlus, Trash2, Key, Users, Shield, Ban } from "lucide-react";
 import { useState } from "react";
 import { useAlert } from "@/contexts/AlertContext";
@@ -17,18 +18,16 @@ const mockUsers = [
     id: "1",
     name: "John Doe",
     email: "john@example.com",
-    role: "USER",
+    role: "ADMIN",
     created_at: "2024-01-10T10:30:00Z",
-    last_login: "2024-01-15T14:20:00Z",
     is_banned: false
   },
   {
     id: "2", 
     name: "Jane Smith",
     email: "jane@example.com",
-    role: "USER",
+    role: "ADMIN",
     created_at: "2024-01-12T09:15:00Z",
-    last_login: "2024-01-14T16:45:00Z",
     is_banned: false
   },
   {
@@ -37,7 +36,6 @@ const mockUsers = [
     email: "admin@usitech.io.vn",
     role: "ADMIN",
     created_at: "2024-01-01T00:00:00Z",
-    last_login: "2024-01-15T10:30:00Z",
     is_banned: false
   }
 ];
@@ -57,7 +55,7 @@ export default function SettingsPage() {
     confirmPassword: ""
   });
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [adminPassword, setAdminPassword] = useState("");
 
   const handleCreateAdmin = () => {
@@ -72,7 +70,6 @@ export default function SettingsPage() {
       email: newAdmin.email,
       role: "ADMIN",
       created_at: new Date().toISOString(),
-      last_login: null,
       is_banned: false
     };
 
@@ -81,7 +78,7 @@ export default function SettingsPage() {
     showSuccess("Success", "Admin created successfully!");
   };
 
-  const handleDeleteUser = (user) => {
+  const handleDeleteUser = (user: any) => {
     setSelectedUser(user);
     setDeleteDialog(true);
   };
@@ -98,6 +95,8 @@ export default function SettingsPage() {
       } else {
         showError("Authentication Error", "Invalid admin password!");
       }
+    } else if (!adminPassword) {
+      showError("Validation Error", "Please enter your admin password!");
     }
   };
 
@@ -121,16 +120,25 @@ export default function SettingsPage() {
       />
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="users" className="flex items-center gap-2">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+          <TabsTrigger 
+            value="users" 
+            className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
+          >
             <Users className="h-4 w-4" />
             Manage Users
           </TabsTrigger>
-          <TabsTrigger value="create" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="create" 
+            className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
+          >
             <UserPlus className="h-4 w-4" />
             Create Admin
           </TabsTrigger>
-          <TabsTrigger value="password" className="flex items-center gap-2">
+          <TabsTrigger 
+            value="password" 
+            className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
+          >
             <Key className="h-4 w-4" />
             Change Password
           </TabsTrigger>
@@ -153,17 +161,11 @@ export default function SettingsPage() {
                       <div>
                         <div className="flex items-center space-x-2">
                           <h4 className="font-medium">{user.name}</h4>
-                          {user.role === 'ADMIN' && (
-                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              <Shield className="h-3 w-3 mr-1" />
-                              ADMIN
-                            </span>
-                          )}
+                         
                         </div>
                         <p className="text-sm text-muted-foreground">{user.email}</p>
                         <p className="text-xs text-muted-foreground">
                           Created: {new Date(user.created_at).toLocaleDateString()}
-                          {user.last_login && ` • Last login: ${new Date(user.last_login).toLocaleDateString()}`}
                         </p>
                       </div>
                     </div>
@@ -172,6 +174,7 @@ export default function SettingsPage() {
                         variant="destructive"
                         size="sm"
                         onClick={() => handleDeleteUser(user)}
+                        className="hover:bg-red-700 hover:shadow-lg transition-all duration-200 hover:scale-105 hover:text-white"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Delete
@@ -299,29 +302,51 @@ export default function SettingsPage() {
       </Tabs>
 
       {/* Delete Admin Confirmation Dialog */}
-      <ConfirmDialog
-        open={deleteDialog}
-        onOpenChange={setDeleteDialog}
-        title="Delete Admin Account"
-        description={
-          <div className="space-y-4">
-            <p>Are you sure you want to delete "{selectedUser?.name}"? This action cannot be undone.</p>
+      <Dialog open={deleteDialog} onOpenChange={setDeleteDialog}>
+        <DialogContent className="sm:max-w-[425px] bg-white border shadow-xl">
+          <DialogHeader>
+            <DialogTitle className="text-gray-900 text-lg font-semibold">Delete Admin Account</DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Are you sure you want to delete "{selectedUser?.name}"? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="adminPassword">Admin Password</Label>
+              <Label htmlFor="adminPassword" className="text-gray-700 font-medium">
+                Admin Password
+              </Label>
               <Input
                 id="adminPassword"
                 type="password"
                 value={adminPassword}
                 onChange={(e) => setAdminPassword(e.target.value)}
                 placeholder="Enter your admin password"
+                className="border-gray-300 focus:border-red-500 focus:ring-red-500"
               />
             </div>
           </div>
-        }
-        confirmText="Delete"
-        variant="destructive"
-        onConfirm={confirmDelete}
-      />
+          <DialogFooter className="gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setDeleteDialog(false);
+                setAdminPassword("");
+              }}
+              className="border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive" 
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700 text-white hover:shadow-lg transition-all duration-200 hover:scale-105"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Admin
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

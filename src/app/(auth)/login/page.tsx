@@ -123,7 +123,7 @@ export default function LoginPage() {
               {/* <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                   <Lock className="h-4 w-4" />
-                  <span>Secure admin access – IP restricted – 2FA enabled</span>
+                  <span>Secure admin access – IP restricted</span>
                 </div>
               </div> */}
           </CardContent>

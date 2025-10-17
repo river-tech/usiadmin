@@ -18,7 +18,6 @@ export default function ProfilePage() {
     avatar: "/avatars/admin.jpg",
     role: "ADMIN",
     joinDate: "2024-01-01",
-    lastLogin: "2024-01-15T10:30:00Z"
   });
 
   const handleSave = () => {
@@ -62,14 +61,14 @@ export default function ProfilePage() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Profile Overview */}
-        <Card className="lg:col-span-1">
+        <Card className="lg:col-span-1 rounded-xl border shadow-sm">
           <CardHeader>
             <CardTitle>Profile Overview</CardTitle>
             <CardDescription>Your account information</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-24 w-24">
+              <Avatar className="h-24 w-24 ring-2 ring-gray-200">
                 <AvatarImage src={profileData.avatar} alt={profileData.name} />
                 <AvatarFallback>
                   <User className="h-12 w-12" />
@@ -78,7 +77,7 @@ export default function ProfilePage() {
               <div className="text-center">
                 <h3 className="text-lg font-semibold">{profileData.name}</h3>
                 <p className="text-sm text-muted-foreground">{profileData.email}</p>
-                <Badge variant="secondary" className="mt-2">
+                <Badge variant="secondary" className="mt-2 rounded-full px-3 py-1">
                   <Shield className="h-3 w-3 mr-1" />
                   {profileData.role}
                 </Badge>
@@ -90,16 +89,13 @@ export default function ProfilePage() {
                 <span className="text-muted-foreground">Member since:</span>
                 <span>{new Date(profileData.joinDate).toLocaleDateString()}</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Last login:</span>
-                <span>{new Date(profileData.lastLogin).toLocaleString()}</span>
-              </div>
+              image.png
             </div>
           </CardContent>
         </Card>
 
         {/* Profile Details */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 rounded-xl border shadow-sm">
           <CardHeader>
             <CardTitle>Account Details</CardTitle>
             <CardDescription>Update your personal information</CardDescription>
@@ -113,6 +109,7 @@ export default function ProfilePage() {
                   value={profileData.name}
                   onChange={(e) => setProfileData({...profileData, name: e.target.value})}
                   disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
                 />
               </div>
               <div className="space-y-2">
@@ -123,6 +120,7 @@ export default function ProfilePage() {
                   value={profileData.email}
                   onChange={(e) => setProfileData({...profileData, email: e.target.value})}
                   disabled={!isEditing}
+                  className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
                 />
               </div>
             </div>
@@ -135,6 +133,7 @@ export default function ProfilePage() {
                 onChange={(e) => setProfileData({...profileData, avatar: e.target.value})}
                 disabled={!isEditing}
                 placeholder="https://example.com/avatar.jpg"
+                className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
               />
             </div>
 
@@ -142,7 +141,7 @@ export default function ProfilePage() {
               <div className="space-y-2">
                 <Label>Role</Label>
                 <div className="flex items-center space-x-2">
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="rounded-full px-3 py-1">
                     <Shield className="h-3 w-3 mr-1" />
                     {profileData.role}
                   </Badge>
@@ -162,32 +161,20 @@ export default function ProfilePage() {
       </div>
 
       {/* Security Settings */}
-      <Card>
+      <Card className="rounded-xl border shadow-sm">
         <CardHeader>
           <CardTitle>Security Settings</CardTitle>
           <CardDescription>Manage your account security and authentication</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Two-Factor Authentication</h4>
-              <p className="text-sm text-muted-foreground">
-                Add an extra layer of security to your account
-              </p>
-            </div>
-            <Button variant="outline" size="sm">
-              Enable 2FA
-            </Button>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border rounded-lg">
+          <div className="flex items-center justify-between p-4 border rounded-lg bg-white">
             <div>
               <h4 className="font-medium">Change Password</h4>
               <p className="text-sm text-muted-foreground">
                 Update your password to keep your account secure
               </p>
             </div>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" size="sm" className="rounded-full">
               Change Password
             </Button>
           </div>

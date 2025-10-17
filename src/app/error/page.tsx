@@ -25,7 +25,7 @@ export default function ErrorPage() {
             <div className="flex items-center justify-center space-x-2 text-xs text-muted-foreground">
               <span>IP Restricted</span>
               <span>•</span>
-              <span>2FA Required</span>
+              <span>Authentication Required</span>
             </div>
           </div>
           
