@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AlertProvider } from "@/contexts/AlertContext";
 import { AlertContainer } from "@/components/ui/Alert";
+import { ReduxProvider } from "@/components/providers/ReduxProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,7 +31,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AlertProvider>
-          {children}
+          <ReduxProvider>
+            
+              {children}
+          </ReduxProvider>
           <AlertContainer />
         </AlertProvider>
       </body>

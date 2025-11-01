@@ -1,14 +1,14 @@
 import { StatCard } from "@/components/ui/StatCard";
 import { ShoppingCart, CheckCircle, Clock, DollarSign } from "lucide-react";
 import { mockPurchases } from "@/lib/mock-data";
+import { PurchasesOverview } from "@/lib/types";
+import { formatCurrencyVND } from "@/lib/utils";
 
-export function PurchaseStats() {
-  const totalPurchases = mockPurchases.length;
-  const completedPurchases = mockPurchases.filter(p => p.status === 'ACTIVE').length;
-  const pendingPurchases = mockPurchases.filter(p => p.status === 'PENDING').length;
-  const totalRevenue = mockPurchases
-    .filter(p => p.status === 'ACTIVE')
-    .reduce((sum, p) => sum + p.amount, 0);
+export function PurchaseStats({ overview }: { overview: PurchasesOverview | null }) {
+  const totalPurchases = overview?.total_purchases || 0;
+  const completedPurchases = overview?.completed || 0;
+  const pendingPurchases = overview?.pending || 0;
+  const totalRevenue = overview?.total_revenue || 0;
 
   const stats = [
     {
@@ -31,7 +31,7 @@ export function PurchaseStats() {
     },
     {
       title: "Total Revenue",
-      value: `$${totalRevenue.toLocaleString()}`,
+      value: formatCurrencyVND(totalRevenue),
       icon: <DollarSign className="h-4 w-4" />,
       description: "All-time revenue"
     }

@@ -21,43 +21,49 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Mail, Ban } from "lucide-react";
 import Link from "next/link";
-import { mockUsers } from "@/lib/mock-data";
-import { formatDistanceToNow } from "date-fns";
+import { UserSearchResponse } from "@/lib/types";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
-import { Label } from "@/components/ui/label";
 import { useAlert } from "@/contexts/AlertContext";
+import { useAppDispatch } from "@/store/hooks";
+import { formatCurrencyVND } from "@/lib/utils";
+import { updateUserBan } from "@/feature/userSlide";
+import { useRouter } from "next/navigation";
 
-export function UserTable() {
+
+interface UserTableProps { users: UserSearchResponse[] }
+
+export function UserTable({ users }: UserTableProps) {
+  const dispatch = useAppDispatch();
   const { showSuccess, showError } = useAlert();
-  const [users, setUsers] = useState(mockUsers);
   const [searchTerm, setSearchTerm] = useState("");
   const [banDialog, setBanDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-
-  const filteredUsers = users.filter(user =>
+  const [selectedUser, setSelectedUser] = useState<UserSearchResponse | null>(null);
+  const router = useRouter();
+  const filteredUsers: UserSearchResponse[] = users.filter((user: UserSearchResponse) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleBanUser = (user) => {
+  const handleBanUser = (user: UserSearchResponse) => {
     setSelectedUser(user);
     setBanDialog(true);
   };
 
-  const confirmBan = () => {
+  const confirmBan = async () => {
     if (selectedUser) {
-      setUsers(users.map(u =>
-        u.id === selectedUser.id
-          ? { ...u, is_banned: !u.is_banned }
-          : u
-      ));
       setBanDialog(false);
       setSelectedUser(null);
-      showSuccess(
-        "Success", 
-        selectedUser.is_banned ? "User unbanned successfully!" : "User banned successfully!"
-      );
+      const res = await dispatch(updateUserBan({ userId: selectedUser.id, body: { is_deleted: !selectedUser.is_banned } }));
+      if (res) {
+        showSuccess("Success", "User status updated");
+      } else {
+        showError("Error", "Failed to update user status");
+      }
     }
+  };
+
+  const handleSendNotification = (user: UserSearchResponse) => {
+    router.push(`/users/${user.id}/sendNoti`);
   };
 
   return (
@@ -108,21 +114,21 @@ export function UserTable() {
                   <p className="text-sm text-muted-foreground">{user.email}</p>
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {new Date(user.joinDate).toLocaleDateString()}
+                  {new Date(user.created_at).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
-                  {user.purchases}
+                  {user.purchases_count}
                 </TableCell>
                 <TableCell className="font-medium">
-                  ${user.totalSpent.toFixed(2)}
+                  {formatCurrencyVND(user.total_spent)}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
-                    <StatusBadge status={user.status} />
+                    <StatusBadge status={user.is_banned ? "banned" : "active"} />
                     {user.is_banned && (
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         <Ban className="h-3 w-3 mr-1" />
-                        BANNED
+                        {user.is_banned ? "Banned" : "Active"}
                       </span>
                     )}
                   </div>
@@ -141,9 +147,9 @@ export function UserTable() {
                           View Profile
                         </Link>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => handleSendNotification(user)}>
                         <Mail className="mr-2 h-4 w-4" />
-                        Send Email
+                        Send Notification
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className={user.is_banned ? "text-green-600 hover:text-green-700 hover:bg-green-50" : "text-red-600 hover:text-red-700 hover:bg-red-50"}

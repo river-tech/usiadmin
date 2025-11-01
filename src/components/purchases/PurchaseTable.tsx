@@ -18,27 +18,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Download, Filter } from "lucide-react";
-import { mockPurchases } from "@/lib/mock-data";
+import { MoreHorizontal, Eye, Download, Filter, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useAlert } from "@/contexts/AlertContext";
-
-export function PurchaseTable() {
+import { useRouter } from "next/navigation";
+import { PurchaseListItem } from "@/lib/types";
+import { PurchaseStatus } from "@/lib/models";
+export function PurchaseTable({ list, isLoading }: { list: PurchaseListItem[], isLoading: boolean }) {
+  const router = useRouter();
   const { showSuccess, showError } = useAlert();
-  const [purchases] = useState(mockPurchases);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const filteredPurchases = purchases.filter(purchase => {
+  const filteredPurchases = list.filter((purchase: PurchaseListItem) => {
     const matchesSearch = 
-      purchase.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      purchase.workflowTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      purchase.transactionId.toLowerCase().includes(searchTerm.toLowerCase());
+      purchase.user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      purchase.workflow.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      purchase.id.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = statusFilter === "all" || purchase.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || purchase.status.toLowerCase() === statusFilter.toLowerCase() as PurchaseStatus;
     
     return matchesSearch && matchesStatus;
   });
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center h-full">
+      <Loader2 className="h-4 w-4 animate-spin" />
+    </div>;
+  }
 
   return (
     <div className="space-y-4">
@@ -96,29 +103,29 @@ export function PurchaseTable() {
               <TableRow key={purchase.id}>
                 <TableCell>
                   <div>
-                    <p className="font-medium">{purchase.userName}</p>
-                    <p className="text-sm text-muted-foreground">{purchase.userEmail}</p>
+                    <p className="font-medium">{purchase.user.name}</p>
+                    <p className="text-sm text-muted-foreground">{purchase.user.email}</p>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <p className="font-medium">{purchase.workflowTitle}</p>
+                  <p className="font-medium">{purchase.workflow.title}</p>
                 </TableCell>
                 <TableCell className="font-medium">
                   ${purchase.amount.toFixed(2)}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {formatDistanceToNow(new Date(purchase.date), { addSuffix: true })}
+                  {formatDistanceToNow(new Date(purchase.paid_at), { addSuffix: true })}
                 </TableCell>
                 <TableCell>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    {purchase.paymentMethod.toUpperCase()}
+                    {purchase.payment_method.toUpperCase()}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={purchase.status} />
+                  <StatusBadge status={purchase.status as PurchaseStatus} />
                 </TableCell>
                 <TableCell className="text-muted-foreground font-mono text-xs">
-                  {purchase.transactionId}
+                  {purchase.id}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -128,7 +135,7 @@ export function PurchaseTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-white border shadow-lg z-50" align="end">
-                      <DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => router.push(`/purchases/${purchase.id}`)}>
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>

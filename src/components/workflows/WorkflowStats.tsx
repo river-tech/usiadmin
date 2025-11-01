@@ -1,34 +1,41 @@
+'use client';
 import { StatCard } from "@/components/ui/StatCard";
 import { Workflow, DollarSign, TrendingUp, Users } from "lucide-react";
-import { mockWorkflows, mockAnalytics } from "@/lib/mock-data";
+import { formatCurrencyVND } from "@/lib/utils";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { RootState } from "@/store";
+import { fetchWorkflowOverview } from "@/feature/workflowSlide";
+import { useEffect } from "react";
 
 export function WorkflowStats() {
-  const publishedWorkflows = mockWorkflows.filter(w => w.status === 'active');
-  const totalRevenue = publishedWorkflows.reduce((sum, w) => sum + w.revenue, 0);
-  const totalSales = publishedWorkflows.reduce((sum, w) => sum + w.sales, 0);
+  const {  overview } = useAppSelector((state: RootState) => state.workflows);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+   dispatch(fetchWorkflowOverview());
+  }, [dispatch]);
 
   const stats = [
     {
       title: "Total Workflows",
-      value: mockWorkflows.length,
+      value: overview?.total_workflows || 0,
       icon: <Workflow className="h-4 w-4" />,
       description: "All workflows in system"
     },
     {
       title: "Active",
-      value: publishedWorkflows.length,
+      value: overview?.active_workflows || 0,
       icon: <TrendingUp className="h-4 w-4" />,
       description: "Currently active"
     },
     {
       title: "Total Sales",
-      value: totalSales,
+      value: overview?.total_sales || 0,
       icon: <Users className="h-4 w-4" />,
       description: "All-time sales count"
     },
     {
       title: "Total Revenue",
-      value: `$${totalRevenue.toLocaleString()}`,
+      value: formatCurrencyVND(overview?.total_revenue || 0),
       icon: <DollarSign className="h-4 w-4" />,
       description: "All-time revenue generated"
     }

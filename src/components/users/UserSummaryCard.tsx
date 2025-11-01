@@ -1,34 +1,32 @@
 import { StatCard } from "@/components/ui/StatCard";
 import { Users, UserCheck, ShoppingCart, DollarSign } from "lucide-react";
 import { mockUsers, mockAnalytics } from "@/lib/mock-data";
+import { formatCurrencyVND } from "@/lib/utils";
+import { UsersOverview } from "@/lib/types";
 
-export function UserSummaryCard() {
-  const activeUsers = mockUsers.filter(user => user.status === 'active').length;
-  const totalSpent = mockUsers.reduce((sum, user) => sum + user.totalSpent, 0);
-  const totalPurchases = mockUsers.reduce((sum, user) => sum + user.purchases, 0);
-
+export function UserSummaryCard({ overview }: { overview: UsersOverview }) {
   const stats = [
     {
       title: "Total Users",
-      value: mockUsers.length,
+      value: overview?.total_users || 0,
       icon: <Users className="h-4 w-4" />,
       description: "All registered users"
     },
     {
       title: "Active Users",
-      value: activeUsers,
+      value: overview?.active_users || 0,
       icon: <UserCheck className="h-4 w-4" />,
       description: "Currently active"
     },
     {
       title: "Total Purchases",
-      value: totalPurchases,
+      value: overview?.total_purchases || 0,
       icon: <ShoppingCart className="h-4 w-4" />,
       description: "All-time purchases"
     },
     {
       title: "Total Spent",
-      value: `$${totalSpent.toLocaleString()}`,
+      value: formatCurrencyVND(overview?.total_spent || 0),
       icon: <DollarSign className="h-4 w-4" />,
       description: "All-time spending"
     }

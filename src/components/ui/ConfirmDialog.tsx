@@ -13,11 +13,11 @@ import { AlertTriangle } from "lucide-react";
 interface ConfirmDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  title: string;
-  description: string;
+  title: React.ReactNode;
+  description: React.ReactNode;
   confirmText?: string;
   cancelText?: string;
-  variant?: 'default' | 'destructive';
+  variant?: 'default' | 'destructive' | 'destructive-red';
   onConfirm: () => void;
 }
 
@@ -62,6 +62,7 @@ export function ConfirmDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isLoading}
+            className={`bg-gray-200 text-gray-700 hover:bg-gray-300 focus:ring-gray-500`}
           >
             {cancelText}
           </Button>
@@ -69,6 +70,7 @@ export function ConfirmDialog({
             variant={variant === 'destructive' ? 'destructive-red' : 'default'}
             onClick={handleConfirm}
             disabled={isLoading}
+            className={variant === 'destructive' ? 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500' : ''}
           >
             {isLoading ? "Processing..." : confirmText}
           </Button>

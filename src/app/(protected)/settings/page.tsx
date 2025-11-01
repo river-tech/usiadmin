@@ -9,108 +9,81 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { UserPlus, Trash2, Key, Users, Shield, Ban } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAlert } from "@/contexts/AlertContext";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { RootState } from "@/store";
+import { createAdmin, fetchAdmins, removeAdmin } from "@/feature/settingSlide";
+import { Admin } from "@/lib/types";
 
-// Mock user data
-const mockUsers = [
-  {
-    id: "1",
-    name: "John Doe",
-    email: "john@example.com",
-    role: "ADMIN",
-    created_at: "2024-01-10T10:30:00Z",
-    is_banned: false
-  },
-  {
-    id: "2", 
-    name: "Jane Smith",
-    email: "jane@example.com",
-    role: "ADMIN",
-    created_at: "2024-01-12T09:15:00Z",
-    is_banned: false
-  },
-  {
-    id: "3",
-    name: "Admin User",
-    email: "admin@usitech.io.vn",
-    role: "ADMIN",
-    created_at: "2024-01-01T00:00:00Z",
-    is_banned: false
-  }
-];
 
 export default function SettingsPage() {
   const { showSuccess, showError } = useAlert();
-  const [users, setUsers] = useState(mockUsers);
+  const [users, setUsers] = useState<Admin[]>([]);
+  const { admins, isLoading, error, successMessage } = useAppSelector((state: RootState) => state.setting);
+  useEffect(() => {
+    if (successMessage) {
+      showSuccess("Success", successMessage);
+    } else if (error) {
+      showError("Error", error);
+    }
+  }, [successMessage, error]);
+  const dispatch = useAppDispatch();
+  useEffect(() => {
+    dispatch(fetchAdmins());
+  }, [dispatch]);
+  useEffect(() => {
+    if (admins) {
+      setUsers(admins);
+    }
+  }, [admins]);
   const [newAdmin, setNewAdmin] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: ""
   });
-  const [changePassword, setChangePassword] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: ""
-  });
+ 
   const [deleteDialog, setDeleteDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [adminPassword, setAdminPassword] = useState("");
 
-  const handleCreateAdmin = () => {
+  const handleCreateAdmin = async () => {
     if (newAdmin.password !== newAdmin.confirmPassword) {
       showError("Validation Error", "Passwords do not match!");
       return;
     }
 
-    const admin = {
-      id: Date.now().toString(),
-      name: newAdmin.name,
-      email: newAdmin.email,
-      role: "ADMIN",
-      created_at: new Date().toISOString(),
-      is_banned: false
-    };
-
-    setUsers([...users, admin]);
-    setNewAdmin({ name: "", email: "", password: "", confirmPassword: "" });
-    showSuccess("Success", "Admin created successfully!");
+    try {
+      await dispatch(createAdmin({ name: newAdmin.name, email: newAdmin.email, password: newAdmin.password }));
+      await dispatch(fetchAdmins())
+      // showSuccess("Success", "Admin created successfully!");
+      setNewAdmin({ name: "", email: "", password: "", confirmPassword: "" });
+    } catch (error: any) {
+      // showError("Error", "Failed to create admin!");
+    }
   };
 
-  const handleDeleteUser = (user: any) => {
-    setSelectedUser(user);
+  const handleDeleteUser = (userId: string) => {
+    console.log("userId", userId);
+    setSelectedUser(userId);
     setDeleteDialog(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (selectedUser && adminPassword) {
-      // In a real app, you'd verify admin password here
-      if (adminPassword === "admin123") { // Mock password
-        setUsers(users.filter(u => u.id !== selectedUser.id));
+      try {
+        await dispatch(removeAdmin({ id: selectedUser, adminPassword }))
+        // showSuccess("Success", "Admin deleted successfully!");
+        await dispatch(fetchAdmins())
         setDeleteDialog(false);
         setSelectedUser(null);
         setAdminPassword("");
-        showSuccess("Success", "Admin deleted successfully!");
-      } else {
-        showError("Authentication Error", "Invalid admin password!");
+      } catch (error) {
+        // showError("Error", "Failed to delete admin!");
       }
-    } else if (!adminPassword) {
-      showError("Validation Error", "Please enter your admin password!");
-    }
-  };
-
-  const handleChangePassword = () => {
-    if (changePassword.newPassword !== changePassword.confirmPassword) {
-      showError("Validation Error", "New passwords do not match!");
-      return;
-    }
-    
-    // In a real app, you'd make an API call here
-    console.log("Changing password...");
-    setChangePassword({ currentPassword: "", newPassword: "", confirmPassword: "" });
-    showSuccess("Success", "Password changed successfully!");
-  };
+    } 
+  }; 
 
   return (
     <div className="space-y-6">
@@ -120,7 +93,7 @@ export default function SettingsPage() {
       />
 
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+        <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-lg">
           <TabsTrigger 
             value="users" 
             className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
@@ -135,13 +108,13 @@ export default function SettingsPage() {
             <UserPlus className="h-4 w-4" />
             Create Admin
           </TabsTrigger>
-          <TabsTrigger 
+          {/* <TabsTrigger 
             value="password" 
             className="flex items-center gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-md data-[state=inactive]:text-gray-600 data-[state=inactive]:hover:text-gray-800 transition-all duration-200"
           >
             <Key className="h-4 w-4" />
             Change Password
-          </TabsTrigger>
+          </TabsTrigger> */}
         </TabsList>
 
         <TabsContent value="users" className="space-y-4">
@@ -156,16 +129,16 @@ export default function SettingsPage() {
                   <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                        {user.name.split(' ').map(n => n[0]).join('')}
+                        {user?.name?.split(' ').map(n => n[0]).join('')}
                       </div>
                       <div>
                         <div className="flex items-center space-x-2">
-                          <h4 className="font-medium">{user.name}</h4>
+                          <h4 className="font-medium">{user?.name}</h4>
                          
                         </div>
-                        <p className="text-sm text-muted-foreground">{user.email}</p>
+                        <p className="text-sm text-muted-foreground">{user?.email}</p>
                         <p className="text-xs text-muted-foreground">
-                          Created: {new Date(user.created_at).toLocaleDateString()}
+                          Created: {new Date(user?.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -173,7 +146,7 @@ export default function SettingsPage() {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeleteUser(user)}
+                        onClick={() => handleDeleteUser(user?.id)}
                         className="hover:bg-red-700 hover:shadow-lg transition-all duration-200 hover:scale-105 hover:text-white"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -249,7 +222,7 @@ export default function SettingsPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="password" className="space-y-4">
+        {/* <TabsContent value="password" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Change Password</CardTitle>
@@ -298,7 +271,7 @@ export default function SettingsPage() {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
+        </TabsContent> */}
       </Tabs>
 
       {/* Delete Admin Confirmation Dialog */}

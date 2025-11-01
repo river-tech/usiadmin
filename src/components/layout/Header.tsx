@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,28 +16,22 @@ import { Bell, Search, User, LogOut, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAlert } from "@/contexts/AlertContext";
+import { useAppDispatch } from "@/store/hooks";
+import { logoutUser } from "@/feature/authSlice";
 
 interface HeaderProps {
   className?: string;
 }
 
 export function Header({ className }: HeaderProps) {
-  const { showSuccess, showError } = useAlert();
   const [notifications] = useState(3); // Mock notification count
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
-  const handleLogout = () => {
-    try {
-      // In a real app, you'd clear auth tokens and redirect
-      console.log("Logging out...");
-      showSuccess("Success", "Logged out successfully!");
-      setTimeout(() => {
-        router.push("/login");
-      }, 1000);
-    } catch (error) {
-      showError("Error", "Failed to logout. Please try again.");
-    }
+
+  const handleLogout = async () => {
+     dispatch(logoutUser());
+     router.push("/login");
   };
 
   return (
@@ -47,14 +41,14 @@ export function Header({ className }: HeaderProps) {
     )}>
       {/* Search */}
       <div className="flex items-center space-x-4 flex-1">
-        <div className="relative">
+        {/* <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search..."
             className="pl-10 pr-4 py-2 w-80 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Right side */}

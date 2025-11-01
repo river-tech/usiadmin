@@ -16,7 +16,8 @@ import {
   // BarChart3,
   Menu,
   X,
-  Shield
+  Shield,
+  Banknote
 } from "lucide-react";
 
 const navigation = [
@@ -52,6 +53,11 @@ const navigation = [
         icon: Bell,
         badge: "3"
       },
+  {
+    title: "Deposits",
+    href: "/deposits",
+    icon: Banknote,
+  },
   // {
   //   title: "Analytics",
   //   href: "/analytics",

@@ -174,7 +174,7 @@ export interface UserWithStats extends User {
   is_banned: boolean;           // derived from is_deleted
 }
 
-export interface WorkflowWithStats extends Workflow {
+export interface WorkflowWithStats extends Omit<Workflow, 'categories'> {
   sales_count: number;          // COUNT(purchases.id)
   revenue: number;              // SUM(purchases.amount)
   preview_image?: string;       // FROM workflow_assets WHERE kind = 'image'
@@ -195,28 +195,7 @@ export interface NotificationWithUser extends Notification {
 
 // ===========================================
 // ADMIN INTERFACE MODELS
-// ===========================================
-
-export interface AdminUser extends UserWithStats {
-  status: 'active' | 'inactive'; // derived from is_deleted
-}
-
-export interface AdminWorkflow extends WorkflowWithStats {
-  status: 'active' | 'expired';  // mapped from workflow_status
-}
-
-export interface AdminPurchase extends PurchaseWithDetails {
-  status: 'ACTIVE' | 'PENDING' | 'REJECT'; // mapped from purchase_status
-  paymentMethod: 'QR';          // mapped from payment_method
-}
-
-export interface AdminNotification extends NotificationWithUser {
-  type: 'SUCCESS' | 'WARNING' | 'ERROR'; // mapped from Enoti
-}
-
-// ===========================================
-// QUERY RESULT MODELS
-// ===========================================
+// ================================
 
 export interface UserStats {
   total_users: number;
@@ -381,58 +360,11 @@ export const Models = {
   AssetKind,
   
   // Core Models
-  User,
-  Notification,
-  ContactMessage,
-  Workflow,
-  Category,
-  WorkflowCategory,
-  WorkflowAsset,
-  Favorite,
-  Comment,
-  Purchase,
-  Invoice,
+  // Notification,
+  // Comment,
   
   // Extended Models
-  UserWithStats,
-  WorkflowWithStats,
-  PurchaseWithDetails,
-  NotificationWithUser,
+
   
-  // Admin Models
-  AdminUser,
-  AdminWorkflow,
-  AdminPurchase,
-  AdminNotification,
-  
-  // Stats Models
-  UserStats,
-  WorkflowStats,
-  PurchaseStats,
-  NotificationStats,
-  
-  // Form Models
-  UserFormData,
-  WorkflowFormData,
-  PurchaseFormData,
-  NotificationFormData,
-  
-  // API Models
-  ApiResponse,
-  PaginatedResponse,
-  SearchFilters,
-  
-  // Utility Types
-  CreateUserData,
-  UpdateUserData,
-  CreateWorkflowData,
-  UpdateWorkflowData,
-  CreatePurchaseData,
-  UpdatePurchaseData,
-  CreateNotificationData,
-  UpdateNotificationData,
-  
-  // Relationships
-  DatabaseRelationships
 } as const;
 

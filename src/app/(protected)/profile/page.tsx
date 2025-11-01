@@ -1,158 +1,223 @@
 "use client";
 
-import { PageHeader } from "@/components/ui/PageHeader";
+import { motion } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Mail, Shield, Calendar, Edit, Save, X } from "lucide-react";
-import { useState } from "react";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Shield, Calendar, Edit, Save, X, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { RootState } from "@/store";
+import { getCurrentUser, updateUserProfile, changePassword } from "@/feature/authSlice";
+import { useAlert } from "@/contexts/AlertContext";
 
 export default function ProfilePage() {
+  const dispatch = useAppDispatch();
+  const { user, isLoading } = useAppSelector((state: RootState) => state.auth);
+  const [profileData, setProfileData] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
-  const [profileData, setProfileData] = useState({
-    name: "Admin User",
-    email: "admin@usitech.io.vn",
-    avatar: "/avatars/admin.jpg",
-    role: "ADMIN",
-    joinDate: "2024-01-01",
-  });
+  const { showSuccess, showError } = useAlert();
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handleSave = () => {
-    // In a real app, you'd make an API call here
-    console.log("Saving profile:", profileData);
-    setIsEditing(false);
+  useEffect(() => {
+    dispatch(getCurrentUser());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (user) setProfileData(user);
+  }, [user]);
+
+  const handleSave = async () => {
+    try {
+      await dispatch(updateUserProfile({ name: profileData?.name || "" })).unwrap();
+      showSuccess("Profile updated", "Your profile has been saved successfully.");
+      setIsEditing(false);
+    } catch (e: any) {
+      showError("Update failed", e?.message || "Could not save your profile.");
+    }
   };
 
   const handleCancel = () => {
+    setProfileData(user);
     setIsEditing(false);
-    // Reset form data if needed
+  };
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      showError("Validation error", "Please fill in all fields");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showError("Validation error", "New password and confirm do not match");
+      return;
+    }
+    try {
+      await dispatch(changePassword({ currentPassword, newPassword })).unwrap();
+      showSuccess("Password updated", "Your password has been changed.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setIsEditing(false);
+    } catch (e: any) {
+      showError("Change failed", e?.detail || "Could not change password.");
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        title="Profile"
-        description="Manage your account settings and preferences"
-        children={
-          <div className="flex gap-2">
-            {isEditing ? (
-              <>
-                <Button onClick={handleSave} size="sm">
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </Button>
-                <Button variant="outline" onClick={handleCancel} size="sm">
-                  <X className="h-4 w-4 mr-2" />
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button onClick={() => setIsEditing(true)} size="sm">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
+    <motion.div
+      className="space-y-10"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* ===== Page Header ===== */}
+      <div className="flex items-center justify-between border-b pb-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Profile
+          </h1>
+          <p className="text-gray-500 mt-1 text-sm">
+            Manage your personal information and account security
+          </p>
+        </div>
+        <div className="flex gap-2">
+          {isEditing ? (
+            <>
+              <Button
+                onClick={handleSave}
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Changes
               </Button>
-            )}
-          </div>
-        }
-      />
+              <Button
+                variant="outline"
+                onClick={handleCancel}
+                size="sm"
+                className="border-gray-300 text-gray-600 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button
+              onClick={() => setIsEditing(true)}
+              size="sm"
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow hover:opacity-90"
+            >
+              <Edit className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
+          )}
+        </div>
+      </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Profile Overview */}
-        <Card className="lg:col-span-1 rounded-xl border shadow-sm">
-          <CardHeader>
-            <CardTitle>Profile Overview</CardTitle>
-            <CardDescription>Your account information</CardDescription>
+      <div className="grid gap-8 lg:grid-cols-3">
+        {/* ===== Profile Overview ===== */}
+        <Card className="rounded-2xl shadow-lg border border-blue-100 bg-gradient-to-br from-blue-50 to-white transition hover:shadow-xl">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-semibold text-gray-800">Profile Overview</CardTitle>
+            <CardDescription className="text-gray-500">
+              Your account summary
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex flex-col items-center space-y-4">
-              <Avatar className="h-24 w-24 ring-2 ring-gray-200">
-                <AvatarImage src={profileData.avatar} alt={profileData.name} />
-                <AvatarFallback>
-                  <User className="h-12 w-12" />
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-center">
-                <h3 className="text-lg font-semibold">{profileData.name}</h3>
-                <p className="text-sm text-muted-foreground">{profileData.email}</p>
-                <Badge variant="secondary" className="mt-2 rounded-full px-3 py-1">
-                  <Shield className="h-3 w-3 mr-1" />
-                  {profileData.role}
-                </Badge>
-              </div>
+
+          <CardContent className="flex flex-col items-center space-y-4 text-center">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-800">
+                {profileData?.name || "No Name"}
+              </h3>
+              <p className="text-sm text-gray-500">{profileData?.email}</p>
             </div>
-            
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Member since:</span>
-                <span>{new Date(profileData.joinDate).toLocaleDateString()}</span>
-              </div>
-              image.png
+
+            <Badge className="rounded-full px-3 py-1 bg-blue-100 text-blue-700 shadow-sm">
+              <Shield className="h-3 w-3 mr-1" />
+              {profileData?.role || "User"}
+            </Badge>
+
+            <div className="flex flex-col items-center text-sm text-gray-500 mt-2">
+              <Calendar className="w-4 h-4 mr-1 inline-block text-blue-500" />
+              Member since:{" "}
+              <span className="text-gray-700">
+                {profileData?.created_at
+                  ? new Date(profileData.created_at).toLocaleDateString()
+                  : "N/A"}
+              </span>
             </div>
           </CardContent>
         </Card>
 
-        {/* Profile Details */}
-        <Card className="lg:col-span-2 rounded-xl border shadow-sm">
-          <CardHeader>
-            <CardTitle>Account Details</CardTitle>
-            <CardDescription>Update your personal information</CardDescription>
+        {/* ===== Account Details ===== */}
+        <Card className="lg:col-span-2 rounded-2xl shadow-lg border border-blue-100 bg-white hover:shadow-xl transition">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl pb-3">
+            <CardTitle className="text-gray-800 font-semibold">Account Details</CardTitle>
+            <CardDescription className="text-gray-500">
+              Update your personal information
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid gap-4 md:grid-cols-2">
+
+          <CardContent className="space-y-6 pt-4">
+            <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
-                <Input
+                <Label htmlFor="name" className="text-gray-700 font-medium">
+                  Full Name
+                </Label>
+                <input
+                  type="text"
                   id="name"
-                  value={profileData.name}
-                  onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                  value={profileData?.name || ""}
+                  onChange={(e) =>
+                    setProfileData(profileData ? { ...profileData, name: e.target.value } : null)
+                  }
                   disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
+                  className={`w-full rounded-lg border px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 focus:outline-none transition ${
+                    !isEditing
+                      ? "bg-gray-50 text-gray-700 border-gray-200"
+                      : "border-blue-300"
+                  }`}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <Input
-                  id="email"
+                <Label htmlFor="email" className="text-gray-700 font-medium">
+                  Email Address
+                </Label>
+                <input
                   type="email"
-                  value={profileData.email}
-                  onChange={(e) => setProfileData({...profileData, email: e.target.value})}
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
+                  id="email"
+                  value={profileData?.email || ""}
+                  readOnly
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 text-gray-700 px-3 py-2 cursor-not-allowed"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="avatar">Avatar URL</Label>
-              <Input
-                id="avatar"
-                value={profileData.avatar}
-                onChange={(e) => setProfileData({...profileData, avatar: e.target.value})}
-                disabled={!isEditing}
-                placeholder="https://example.com/avatar.jpg"
-                className={!isEditing ? "bg-gray-50 text-gray-700" : undefined}
-              />
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <Label>Role</Label>
+                <Label className="text-gray-700 font-medium">Role</Label>
                 <div className="flex items-center space-x-2">
-                  <Badge variant="secondary" className="rounded-full px-3 py-1">
-                    <Shield className="h-3 w-3 mr-1" />
-                    {profileData.role}
+                  <Badge className="rounded-full px-3 py-1 bg-blue-50 text-blue-700">
+                    <Shield className="h-3 w-3 mr-1 text-blue-500" />
+                    {profileData?.role || "User"}
                   </Badge>
-                  <span className="text-sm text-muted-foreground">Cannot be changed</span>
+                  <span className="text-sm text-gray-400">Cannot be changed</span>
                 </div>
               </div>
+
               <div className="space-y-2">
-                <Label>Member Since</Label>
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm">{new Date(profileData.joinDate).toLocaleDateString()}</span>
+                <Label className="text-gray-700 font-medium">Joined</Label>
+                <div className="flex items-center space-x-2 text-gray-600">
+                  <Calendar className="h-4 w-4 text-blue-500" />
+                  <span className="text-sm">
+                    {profileData?.created_at
+                      ? new Date(profileData.created_at).toLocaleDateString()
+                      : "N/A"}
+                  </span>
                 </div>
               </div>
             </div>
@@ -160,27 +225,72 @@ export default function ProfilePage() {
         </Card>
       </div>
 
-      {/* Security Settings */}
-      <Card className="rounded-xl border shadow-sm">
-        <CardHeader>
-          <CardTitle>Security Settings</CardTitle>
-          <CardDescription>Manage your account security and authentication</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg bg-white">
-            <div>
-              <h4 className="font-medium">Change Password</h4>
-              <p className="text-sm text-muted-foreground">
-                Update your password to keep your account secure
-              </p>
+      {/* ===== Security Settings (Change Password Full Width) ===== */}
+      <div className="mt-8">
+        <Card className="rounded-2xl shadow-lg border border-blue-100 bg-gradient-to-br from-blue-50 to-white hover:shadow-xl transition w-full">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-2xl pb-3">
+            <CardTitle className="text-gray-800 font-semibold">Security Settings</CardTitle>
+            <CardDescription className="text-gray-500">
+              Manage your account password
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6 pt-4 w-full">
+            <div className="space-y-4 w-full">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword" className="text-gray-700 font-medium">
+                  Current Password
+                </Label>
+                <input
+                  id="currentPassword"
+                  type="password"
+                  placeholder="Enter your current password"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 transition"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="newPassword" className="text-gray-700 font-medium">
+                  New Password
+                </Label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  placeholder="Enter a new password"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 transition"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-gray-700 font-medium">
+                  Confirm New Password
+                </Label>
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Re-enter your new password"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-500 transition"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="flex justify-end pt-4">
+                <Button
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:opacity-90 text-white rounded-lg px-6 py-2 font-medium shadow"
+                  onClick={handleUpdatePassword}
+                >
+                  Update Password
+                </Button>
+              </div>
             </div>
-            <Button variant="outline" size="sm" className="rounded-full">
-              Change Password
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
   );
 }
-

@@ -1,28 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Shield, Lock, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
+import { RootState } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { loginUser } from "@/feature/authSlice";
+import { useRouter } from "next/navigation";
+
 
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useAppDispatch();
+  const { isLoading, error, isAuthenticated } = useAppSelector((state: RootState) => state.auth) as { isLoading: boolean; error: string | null; isAuthenticated: boolean };
+  
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/workflows"); // ✅ đổi thành route bạn muốn
+    }
+  }, [isAuthenticated, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    
-    // Mock login delay
-    setTimeout(() => {
-      setIsLoading(false);
-      // In a real app, you'd handle authentication here
-      window.location.href = '/dashboard';
-    }, 1000);
+    await dispatch(loginUser({ email, password }) );
   };
 
   return (
@@ -57,6 +65,8 @@ export default function LoginPage() {
                   placeholder="admin@usitech.io.vn"
                   required
                   className="focus-ring"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
 
@@ -67,6 +77,8 @@ export default function LoginPage() {
                 <div className="relative">
                   <Input
                     id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
                     required
@@ -109,6 +121,12 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
+              {error && (
+                <div className="mt-2 rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 border border-red-200">
+                  {error}
+                </div>
+              )}
+
 
               <Button
                 type="submit"
@@ -133,6 +151,11 @@ export default function LoginPage() {
         <div className="text-center mt-8 text-blue-100 text-sm">
           <p>© 2024 UsITech. All rights reserved.</p>
         </div>
+        
+        {/* Debug Component */}
+        {/* <div className="mt-8">
+          <DebugLogin />
+        </div> */}
       </div>
     </div>
   );

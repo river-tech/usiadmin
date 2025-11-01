@@ -23,18 +23,18 @@ const statusConfig = {
 };
 
 export function StatusBadge({ status, variant = 'default', className }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status as keyof typeof statusConfig];
   
   return (
     <Badge 
       variant={variant}
       className={cn(
         "border",
-        config.className,
+        config?.className,
         className
       )}
     >
-      {config.label}
+      {config?.label}
     </Badge>
   );
 }
