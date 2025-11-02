@@ -62,9 +62,9 @@ export function WorkflowTable() {
 
   // Xử lý filter cho mảng categories là string[]
   const filteredWorkflows = workflows.filter((workflow: AllWorkflowsResponse) => {
-    const categoriesText = Array.isArray(workflow.categories)
-      ? workflow.categories.join(", ")
-      : (workflow.categories[0] || "");
+    const categoriesText = workflow.categories?.length
+    ? workflow.categories.join(", ")
+    : "Uncategorized";
     return (
       workflow.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       categoriesText.toLowerCase().includes(searchTerm.toLowerCase())
@@ -151,10 +151,9 @@ export function WorkflowTable() {
                 <TableCell>
                   <CategoryBadge
                     category={
-                      // Ưu tiên lấy category đầu tiên của categories nếu tồn tại
-                      Array.isArray(workflow.categories)
+                      workflow.categories?.length
                         ? workflow.categories[0] || "Uncategorized"
-                        : workflow.categories[0] || "Uncategorized"
+                        : "Uncategorized"
                     }
                     className="text-xs px-2.5 py-0.5"
                   />
@@ -166,12 +165,14 @@ export function WorkflowTable() {
                   {typeof workflow.sales_count === "number" ? workflow.sales_count : "--"}
                 </TableCell>
                 <TableCell className="text-muted-foreground">
-                  {formatDistanceToNow(new Date(workflow.created_at), {
-                    addSuffix: true,
-                  })}
+                  {workflow?.created_at
+                    ? formatDistanceToNow(new Date(workflow.created_at), {
+                        addSuffix: true,
+                      })
+                    : "--"}
                 </TableCell>
                 <TableCell>
-                  <StatusBadge status={workflow.status as WorkflowStatus} />
+                  <StatusBadge status={workflow?.status as WorkflowStatus} />
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
@@ -202,18 +203,18 @@ export function WorkflowTable() {
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         className={
-                          workflow.status === WorkflowStatus.ACTIVE
+                          workflow?.status === WorkflowStatus.ACTIVE
                             ? "text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
                             : "text-green-600 hover:text-green-700 hover:bg-green-50"
                         }
                         onClick={() =>
-                          workflow.status === WorkflowStatus.ACTIVE
+                          workflow?.status === WorkflowStatus.ACTIVE
                             ? handleDelete(workflow.id)
                             : handleActivate(workflow.id)
                         }
                         style={{ outline: "none" }}
                       >
-                        {workflow.status === WorkflowStatus.ACTIVE ? (
+                        {workflow?.status === WorkflowStatus.ACTIVE ? (
                           <>
                             <Trash2 className="mr-2 h-4 w-4" />
                             Deactivate

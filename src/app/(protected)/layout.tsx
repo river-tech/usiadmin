@@ -11,6 +11,7 @@ export default function ProtectedLayout({
 }: {
   children: React.ReactNode;
 }) {
+  
   return (
     <LayoutWrapper>
       {children}

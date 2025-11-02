@@ -16,15 +16,17 @@ import { Bell, Search, User, LogOut, Settings, Shield } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { logoutUser } from "@/feature/authSlice";
+import { RootState } from "@/store";
 
 interface HeaderProps {
   className?: string;
 }
 
 export function Header({ className }: HeaderProps) {
-  const [notifications] = useState(3); // Mock notification count
+  const {list} = useAppSelector((state: RootState) => state.notification);
+
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -61,12 +63,12 @@ export function Header({ className }: HeaderProps) {
           onClick={() => router.push("/notifications")}
         >
           <Bell className="h-5 w-5" />
-          {notifications > 0 && (
+          {list.length > 0 && (
             <Badge 
               variant="destructive" 
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
-              {notifications}
+              {list.filter(item => item.is_unread).length}
             </Badge>
           )}
         </Button>

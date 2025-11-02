@@ -9,7 +9,6 @@ import {
 import type {
   DepositResponse,
   OverviewDeposit,
-  ActivateDepositResponse,
   DepositStatus,
 } from "@/lib/types";
 
@@ -88,7 +87,14 @@ const depositSlice = createSlice({
   initialState,
   reducers: {
     clearDepositError: (state) => { state.error = null; },
-    resetDepositAction: (state) => { state.activateSuccess = false; state.rejectSuccess = false; }
+    resetDepositAction: (state) => { state.activateSuccess = false; state.rejectSuccess = false; },
+    addNewDeposit: (state, action: PayloadAction<DepositResponse>) => {
+      // Thêm deposit mới vào đầu danh sách (prepend)
+      const existing = state.list.find(d => d.id === action.payload.id);
+      if (!existing) {
+        state.list = [action.payload, ...state.list];
+      }
+    }
   },
   extraReducers: (builder) => {
     // List all deposits
@@ -128,7 +134,11 @@ const depositSlice = createSlice({
       state.list = state.list.map(deposit =>
         deposit.id === action.payload ? { ...deposit, status: "SUCCESS" as typeof deposit.status } : deposit
       );
-      state.isLoading = false; state.activateSuccess = false; state.error = action.payload as string;
+    });
+    builder.addCase(activateDepositThunk.rejected, (state, action) => {
+      state.isLoading = false;
+      state.activateSuccess = false;
+      state.error = action.payload as string;
     });
 
     // Reject deposit
@@ -147,7 +157,7 @@ const depositSlice = createSlice({
   }
 });
 
-export const { clearDepositError, resetDepositAction } = depositSlice.actions;
+export const { clearDepositError, resetDepositAction, addNewDeposit } = depositSlice.actions;
 
 export const selectDeposits = (state: RootState) => state.deposits.list;
 export const selectDepositLoading = (state: RootState) => state.deposits.isLoading;

@@ -134,7 +134,7 @@ const authSlice = createSlice({
           localStorage.removeItem(EXPIRY_KEY);
           state.token = null;
           state.isAuthenticated = false;
-        } else {
+      } else {
           state.token = token;
           state.isAuthenticated = true;
         }

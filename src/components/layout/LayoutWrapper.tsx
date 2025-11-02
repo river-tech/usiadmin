@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { cn } from "@/lib/utils";
+import { useAdminWebSocket } from "@/socket/hook";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -12,6 +13,9 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children, className }: LayoutWrapperProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Tự động connect WebSocket để nhận deposit requests mới
+  useAdminWebSocket();
 
   return (
     <div className="flex h-screen bg-background">

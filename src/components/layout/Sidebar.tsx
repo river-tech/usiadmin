@@ -19,6 +19,8 @@ import {
   Shield,
   Banknote
 } from "lucide-react";
+import { useAppSelector } from "@/store/hooks";
+import { RootState } from "@/store";
 
 const navigation = [
   {
@@ -57,7 +59,7 @@ const navigation = [
     title: "Deposits",
     href: "/deposits",
     icon: Banknote,
-  },
+      },
   // {
   //   title: "Analytics",
   //   href: "/analytics",
@@ -72,6 +74,28 @@ interface SidebarProps {
 export function Sidebar({ className }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const pathname = usePathname();
+
+  const {workflows} = useAppSelector((state: RootState) => state.workflows);
+  const {list} = useAppSelector((state: RootState) => state.notification);
+
+  // Lấy số lượng workflows và notification unread để gắn vào badge cho navigation sidebar
+
+  // Lấy số workflow hiện có
+  const workflowCount = Array.isArray(workflows) ? workflows.length : 0;
+
+  // Tính số lượng notification chưa đọc
+  const unreadNotifications = Array.isArray(list) ? list.filter(item => item.is_unread === true).length : 0;
+
+  // Gán badge cho menu notification và workflows (nếu có mục workflows)
+  navigation.forEach(item => {
+    if (item.title === "Notifications & Logs") {
+      item.badge = unreadNotifications > 0 ? String(unreadNotifications) : undefined;
+    }
+    if (item.title === "Workflows") {
+      // Example: gán tổng số workflows vào badge nếu muốn hiển thị
+      item.badge = workflowCount > 0 ? String(workflowCount) : undefined;
+    }
+  });
 
   return (
     <div className={cn(

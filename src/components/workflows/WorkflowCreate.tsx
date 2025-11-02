@@ -50,6 +50,7 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
   const [imagePreview, setImagePreview] = useState<string[]>([]);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // ✳️ Input handler
   const handleInputChange = (field: string, value: any) => {
@@ -127,11 +128,54 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
     }
   };
 
+  // ✳️ Validate form
+  const validateForm = (): string | null => {
+    // Kiểm tra title
+    if (!formData.title || formData.title.trim() === "") {
+      return "Title is required";
+    }
+
+    // Kiểm tra description
+    if (!formData.description || formData.description.trim() === "") {
+      return "Description is required";
+    }
+
+    // Kiểm tra flow/JSON
+    if (!formData.flow || Object.keys(formData.flow).length === 0) {
+      return "Workflow JSON file is required";
+    }
+
+    // Kiểm tra categories
+    if (!formData.category_ids || formData.category_ids.length === 0) {
+      return "At least one category is required";
+    }
+
+    // Kiểm tra price
+    if (!formData.price || Number(formData.price) <= 0) {
+      return "Price must be greater than 0";
+    }
+
+    // Kiểm tra time_to_setup
+    if (!formData.time_to_setup || Number(formData.time_to_setup) <= 0) {
+      return "Setup time must be greater than 0";
+    }
+
+    return null;
+  };
+
   // ✳️ Submit
   const handleSubmit = () => {
+    // Validate form trước khi submit
+    const validationError = validateForm();
+    if (validationError) {
+      showError("Validation Error", validationError);
+      return;
+    }
+
+    setIsPublishing(true);
     const body: WorkflowBody = {
-      title: formData.title,
-      description: formData.description,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
       price: Number(formData.price),
       features: formData.features,
       time_to_setup: Number(formData.time_to_setup),
@@ -140,6 +184,8 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
       category_ids: formData.category_ids,
     };
     onSubmit(body, imagePreview);
+    
+    setIsPublishing(false);
   };
 
   // ✳️ Steps
@@ -471,8 +517,8 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
             {currentStep < 4 ? (
               <Button onClick={() => setCurrentStep(currentStep + 1)}>Next</Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={loading}>
-                <Save className="h-4 w-4 mr-2" /> {loading ? "Publishing..." : "Publish Workflow"}
+              <Button onClick={handleSubmit} disabled={isPublishing}>
+                <Save className="h-4 w-4 mr-2" /> {isPublishing ? "Publishing..." : "Publish Workflow"}
               </Button>
             )}
           </div>

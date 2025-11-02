@@ -261,6 +261,29 @@ export interface OverviewDeposit{
   rejected: number;
 }
 
+// WebSocket types
+export interface WebSocketDepositMessage {
+  type: "new_deposit_request" | "connected" | "error";
+  event?: string;
+  transaction?: {
+    id: string;
+    status: string;
+    amount: number;
+    bank_name: string;
+    bank_account: string;
+    transfer_code: string;
+    created_at: string;
+  };
+  user?: {
+    id: string;
+    name: string;
+    email: string;
+  };
+  notification?: AdminNotification;
+  message?: string;
+  timestamp?: string;
+}
+
 // // Workflow types
 // export interface Workflow {
 //   id: string;

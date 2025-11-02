@@ -8,13 +8,13 @@ import { createNewWorkflow, uploadAsset } from "@/feature/workflowSlide";
 import { WorkflowCreate } from "@/components/workflows/WorkflowCreate";
 import { useEffect, useState } from "react";
 import { fetchCategories } from "@/feature/categorSlice";
-
+import { useRouter } from "next/navigation";
 export default function UploadWorkflowPage() {
   const {showSuccess, showError} = useAlert();
   const dispatch = useAppDispatch();
   const {categories} = useAppSelector((state: RootState) => state.categories);
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
@@ -29,6 +29,10 @@ export default function UploadWorkflowPage() {
         }));
       }
     } 
+    showSuccess("Workflow created", "Workflow has been created");
+    if (result) {
+      router.push(`/workflows/${result.payload.id}/`);
+    }
     setLoading(false);
   };
   return (

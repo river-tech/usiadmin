@@ -169,10 +169,51 @@ export function WorkflowForm({
     }
   };
 
+  const validateForm = (): string | null => {
+    // Kiểm tra title
+    if (!formData.title || formData.title.trim() === "") {
+      return "Title is required";
+    }
+
+    // Kiểm tra description
+    if (!formData.description || formData.description.trim() === "") {
+      return "Description is required";
+    }
+
+    // Kiểm tra flow/JSON
+    if (!formData.flow || Object.keys(formData.flow).length === 0) {
+      return "Workflow JSON file is required";
+    }
+
+    // Kiểm tra categories
+    if (!formData.category_ids || formData.category_ids.length === 0) {
+      return "At least one category is required";
+    }
+
+    // Kiểm tra price
+    if (!formData.price || Number(formData.price) <= 0) {
+      return "Price must be greater than 0";
+    }
+
+    // Kiểm tra time_to_setup
+    if (!formData.time_to_setup || Number(formData.time_to_setup) <= 0) {
+      return "Setup time must be greater than 0";
+    }
+
+    return null;
+  };
+
   const handleSubmit = () => {
+    // Validate form trước khi submit
+    const validationError = validateForm();
+    if (validationError) {
+      showError("Validation Error", validationError);
+      return;
+    }
+
     const body: WorkflowBody = {
-      title: formData.title,
-      description: formData.description,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
       price: Number(formData.price) || 0,
       features: Array.isArray(formData.features) ? formData.features : [],
       time_to_setup: Number(formData.time_to_setup) || 0,

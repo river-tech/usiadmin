@@ -9,6 +9,7 @@ import { useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
 import { activateDeposit, rejectDeposit } from "@/api/deposit";
+import { createNotificationThunk } from "@/feature/notificationSlide";
 import { useAppDispatch } from "@/store/hooks";
 import { activateDepositThunk, rejectDepositThunk } from "@/feature/depositSlide";
 export function DepositTable({ list, isLoading }: { list: DepositResponse[], isLoading: boolean }) {
@@ -20,8 +21,20 @@ export function DepositTable({ list, isLoading }: { list: DepositResponse[], isL
   const handleConfirm = async () => {
     if (action === "activate") {
       await dispatch(activateDepositThunk(selectedDeposit?.id || ""));
+      await dispatch(createNotificationThunk({
+        user_id: selectedDeposit?.user_id || "",
+        title: "Deposit Activated",
+        message: "Your deposit has been activated successfully",
+        type: "SUCCESS",
+      }));
     } else if (action === "reject") {
       await dispatch(rejectDepositThunk(selectedDeposit?.id || ""));
+      await dispatch(createNotificationThunk({
+        user_id: selectedDeposit?.user_id || "",
+        title: "Deposit Rejected",
+        message: "Your deposit has been rejected",
+        type: "ERROR",
+      }));
     }
   };
   return (

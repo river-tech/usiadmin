@@ -7,13 +7,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Check, X, AlertCircle, Info, CheckCircle, Search } from "lucide-react";
+import { Bell, Check, X, AlertCircle, Info, CheckCircle, Search, Trash2 } from "lucide-react";
 import { useAlert } from "@/contexts/AlertContext";
 import {
   fetchNotifications,
   markAllNotificationsReadThunk,
   markNotificationReadThunk,
   deleteNotificationThunk,
+  deleteAllNotificationsThunk,
   selectNotifications,
   selectUnreadNotificationCount,
   selectNotificationLoading,
@@ -21,6 +22,7 @@ import {
 } from "@/feature/notificationSlide";
 import { AdminNotification, AdminNotificationType } from "@/lib/types";
 import { RootState } from "@/store";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 const getNotificationIcon = (type: string) => {
   switch (type) {
@@ -55,6 +57,7 @@ export default function NotificationsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [notificationFilter, setNotificationFilter] = useState("all");
   const [isSendingNotificationToAllUsers, setIsSendingNotificationToAllUsers] = useState(false);
+  const [showDeleteAllConfirm, setShowDeleteAllConfirm] = useState(false);
 
   useEffect(() => {
     dispatch(fetchNotifications());
@@ -79,6 +82,17 @@ export default function NotificationsPage() {
       dispatch(fetchNotifications());
     } catch {
       showError("Error", "Failed to mark notifications as read. Please try again.");
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      const result = await dispatch(deleteAllNotificationsThunk()).unwrap();
+      showSuccess("Success", result.message || "All notifications deleted successfully!");
+      dispatch(fetchNotifications());
+      setShowDeleteAllConfirm(false);
+    } catch {
+      showError("Error", "Failed to delete all notifications. Please try again.");
     }
   };
 
@@ -138,10 +152,22 @@ export default function NotificationsPage() {
         title="Notifications"
         description={`You have ${total} unread notifications`}
         children={
-          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isLoading}>
-            <Check className="h-4 w-4 mr-2" />
-            Mark All Read
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isLoading || list.length === 0}>
+              <Check className="h-4 w-4 mr-2" />
+              Mark All Read
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowDeleteAllConfirm(true)} 
+              disabled={isLoading || list.length === 0}
+              className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete All
+            </Button>
+          </div>
         }
       />
 
@@ -342,6 +368,18 @@ export default function NotificationsPage() {
             </div>
           )
       }
+
+      {/* Confirm Delete All Dialog */}
+      <ConfirmDialog
+        open={showDeleteAllConfirm}
+        onOpenChange={setShowDeleteAllConfirm}
+        title="Delete All Notifications"
+        description={`Are you sure you want to delete all ${list.length} notifications? This action cannot be undone.`}
+        confirmText="Delete All"
+        cancelText="Cancel"
+        variant="destructive"
+        onConfirm={handleDeleteAll}
+      />
     </div>
     
   );
