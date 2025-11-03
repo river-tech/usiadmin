@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
+import { DepositStatus } from "@/lib/types";
 
 const navigation = [
   {
@@ -77,6 +78,7 @@ export function Sidebar({ className }: SidebarProps) {
 
   const {workflows} = useAppSelector((state: RootState) => state.workflows);
   const {list} = useAppSelector((state: RootState) => state.notification);
+  const {list: depositsList} = useAppSelector((state: RootState) => state.deposits);
 
   // Lấy số lượng workflows và notification unread để gắn vào badge cho navigation sidebar
 
@@ -94,6 +96,9 @@ export function Sidebar({ className }: SidebarProps) {
     if (item.title === "Workflows") {
       // Example: gán tổng số workflows vào badge nếu muốn hiển thị
       item.badge = workflowCount > 0 ? String(workflowCount) : undefined;
+    }
+    if (item.title === "Deposits") {
+      item.badge = depositsList.filter(item => item.status === "PENDING").length > 0 ? String(depositsList.filter(item => item.status === "PENDING").length) : undefined;
     }
   });
 

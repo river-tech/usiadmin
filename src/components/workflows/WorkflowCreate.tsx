@@ -26,7 +26,11 @@ interface WorkflowCreateProps {
   loading?: boolean;
 }
 
-export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreateProps) {
+export function WorkflowCreate({
+  onSubmit,
+  categories,
+  loading,
+}: WorkflowCreateProps) {
   const { showSuccess, showError } = useAlert();
   const categoryState = useAppSelector(selectCategories);
   const allCategories: Category[] =
@@ -78,7 +82,10 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
   // ✳️ Upload workflow JSON
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file && (file.type === "application/json" || file.name.endsWith(".json"))) {
+    if (
+      file &&
+      (file.type === "application/json" || file.name.endsWith(".json"))
+    ) {
       const reader = new FileReader();
       reader.onload = (e) => {
         try {
@@ -107,7 +114,7 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
       }
     } catch (e: any) {
       showError("Upload failed", e.message || "Image upload failed");
-    } 
+    }
     setIsUploadingImage(false);
   };
 
@@ -184,15 +191,27 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
       category_ids: formData.category_ids,
     };
     onSubmit(body, imagePreview);
-    
+
     setIsPublishing(false);
   };
 
   // ✳️ Steps
   const steps = [
-    { id: 1, title: "Upload JSON", description: "Upload your workflow JSON file" },
-    { id: 2, title: "Details", description: "Add title, description, and feature" },
-    { id: 3, title: "Pricing & Categories", description: "Set price and categories" },
+    {
+      id: 1,
+      title: "Upload JSON",
+      description: "Upload your workflow JSON file",
+    },
+    {
+      id: 2,
+      title: "Details",
+      description: "Add title, description, and feature",
+    },
+    {
+      id: 3,
+      title: "Pricing & Categories",
+      description: "Set price and categories",
+    },
     { id: 4, title: "Preview", description: "Review before publishing" },
   ];
 
@@ -216,7 +235,9 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
               <p className="text-sm font-medium">{step.title}</p>
               <p className="text-xs text-gray-500">{step.description}</p>
             </div>
-            {index < steps.length - 1 && <div className="w-12 h-0.5 mx-4 bg-gray-200" />}
+            {index < steps.length - 1 && (
+              <div className="w-12 h-0.5 mx-4 bg-gray-200" />
+            )}
           </div>
         ))}
       </div>
@@ -225,16 +246,23 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
       <Card>
         <CardHeader>
           <CardTitle>Upload New Workflow</CardTitle>
-          <CardDescription>{steps[currentStep - 1].description}</CardDescription>
+          <CardDescription>
+            {steps[currentStep - 1].description}
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          <Tabs value={currentStep.toString()} onValueChange={(v) => setCurrentStep(Number(v))}>
+          <Tabs
+            value={currentStep.toString()}
+            onValueChange={(v) => setCurrentStep(Number(v))}
+          >
             {/* Step 1: Upload JSON */}
             <TabsContent value="1" className="space-y-4">
               <div className="border-2 border-dashed border-blue-300 rounded-lg p-8 text-center bg-blue-50">
                 <Upload className="h-10 w-10 text-blue-600 mx-auto mb-4" />
-                <p className="text-gray-700 mb-4">Upload your workflow JSON file</p>
+                <p className="text-gray-700 mb-4">
+                  Upload your workflow JSON file
+                </p>
                 <input
                   type="file"
                   accept=".json"
@@ -266,11 +294,15 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
               <textarea
                 placeholder="Workflow description"
                 value={formData.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 className="w-full border rounded-md p-2"
               />
               <div>
-                <label className="font-medium text-sm text-gray-700">Features</label>
+                <label className="font-medium text-sm text-gray-700">
+                  Features
+                </label>
                 <div className="flex gap-2 mt-1">
                   <Input
                     placeholder="Add feature"
@@ -297,7 +329,7 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
             <TabsContent value="3" className="space-y-4">
               <Input
                 type="number"
-                placeholder="Price ($)"
+                placeholder="Price (VND)"
                 value={formData.price}
                 onChange={(e) => handleInputChange("price", e.target.value)}
               />
@@ -305,10 +337,14 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
                 type="number"
                 placeholder="Setup time (minutes)"
                 value={formData.time_to_setup}
-                onChange={(e) => handleInputChange("time_to_setup", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("time_to_setup", e.target.value)
+                }
               />
               <div>
-                <label className="font-medium text-sm text-gray-700 mb-1 block">Categories</label>
+                <label className="font-medium bg-gray-300 text-white px-2 py-1 rounded-lg w-fit text-sm text-gray-700 mb-1 block">
+                  Categories
+                </label>
                 <div className="flex flex-wrap gap-2">
                   {allCategories.map((c) => {
                     const selected = formData.category_ids.includes(c.id);
@@ -317,7 +353,9 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
                         key={c.id}
                         variant={selected ? "default" : "outline"}
                         className={`text-sm px-3 py-1 rounded-full ${
-                          selected ? "bg-pink-500 text-white" : "border-pink-300 text-gray-700"
+                          selected
+                            ? "bg-pink-500 text-white"
+                            : "border-pink-300 text-gray-700"
                         }`}
                         onClick={() => {
                           setFormData((prev) => ({
@@ -337,53 +375,77 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
 
               {/* Upload image/video */}
               <div className="flex flex-col gap-3 mt-3">
-                <label className="font-medium text-sm text-gray-700">Upload Media</label>
+                <label className="font-medium text-sm text-gray-700">
+                  Upload Media
+                </label>
                 <div className="flex gap-3">
                   <Input
                     type="file"
                     accept="image/*"
                     onChange={(e) => handleImageUpload(e.target.files?.[0]!)}
-                    disabled={isUploadingImage}
+                    disabled={isUploadingImage || imagePreview.length >= 4}
                   />
                   <Input
                     type="file"
                     accept="video/*"
                     onChange={(e) => handleVideoUpload(e.target.files?.[0]!)}
-                    disabled={isUploadingVideo}
+                    disabled={isUploadingVideo || !!formData.video_demo}
                   />
                 </div>
-                {isUploadingImage && <p className="text-xs text-blue-600">Uploading image...</p>}
-                {isUploadingVideo && <p className="text-xs text-purple-600">Uploading video...</p>}
+                {isUploadingImage && (
+                  <p className="text-xs text-blue-600">Uploading image...</p>
+                )}
+                {isUploadingVideo && (
+                  <p className="text-xs text-purple-600">Uploading video...</p>
+                )}
               </div>
 
               {imagePreview.length > 0 ? (
-                      <div className="grid grid-cols-4 gap-2 mt-2">
-                        {imagePreview
-                          .slice(0, 4)
-                          .map((image: string, idx: number) => (
-                            <div key={idx} className="relative group">
-                              <img
-                                src={image}
-                                alt="Workflow asset"
-                                className="rounded-lg border shadow w-full h-20 object-cover"
-                              />
-                              <button
-                                type="button"
-                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
-                                onClick={() => {
-                                  setImagePreview(imagePreview.filter((img) => img !== image));
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
+                <div className="grid grid-cols-4 gap-2 mt-2 w-full max-w-full overflow-hidden">
+                  {imagePreview
+                    .slice(0, 4)
+                    .map((image: string, idx: number) => (
+                      <div
+                        key={idx}
+                        className="relative group w-full overflow-hidden"
+                      >
+                        <img
+                          src={image}
+                          alt="Workflow asset"
+                          className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                        />
+                        <button
+                          type="button"
+                          className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
+                          onClick={() => {
+                            setImagePreview(
+                              imagePreview.filter((img) => img !== image)
+                            );
+                          }}
+                        >
+                          <X className="h-2 w-2" />
+                        </button>
                       </div>
-                    ) : (
-                      <span className="text-gray-500 text-sm ml-2 mt-2">
-                        No image preview
-                      </span>
-                    )}
+                    ))}
+                </div>
+              ) : (
+                <span className="text-gray-500 text-sm ml-2 mt-2">
+                  No image preview
+                </span>
+              )}
+
+              {formData?.video_demo && (
+                <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
+                  <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
+                    Video preview:
+                  </span>
+                  <video
+                    className="rounded-lg border shadow max-h-32 max-w-full object-contain w-full"
+                    controls
+                    src={formData.video_demo}
+                  />
+                </div>
+              )}
             </TabsContent>
 
             {/* Step 4: Preview */}
@@ -448,12 +510,12 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
 
                   {/* Assets Preview */}
                   {formData?.video_demo && (
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
                       <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
                         Video preview:
                       </span>
                       <video
-                        className="rounded-lg border shadow max-h-32 object-contain"
+                        className="rounded-lg border shadow max-h-32 max-w-full object-contain w-full"
                         controls
                         src={formData.video_demo}
                       />
@@ -461,20 +523,23 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
                   )}
 
                   {imagePreview && (
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
                       <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold mb-2">
                         Image preview:
                       </span>
                       {imagePreview.length > 0 ? (
-                        <div className="grid grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-4 gap-2 mt-2 w-full max-w-full overflow-hidden">
                           {imagePreview
                             .slice(0, 4)
                             .map((image: string, idx: number) => (
-                              <div key={idx} className="relative group">
+                              <div
+                                key={idx}
+                                className="relative group w-full overflow-hidden"
+                              >
                                 <img
                                   src={image}
                                   alt="Workflow asset"
-                                  className="rounded-lg border shadow w-full h-20 object-cover"
+                                  className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
                                 />
                               </div>
                             ))}
@@ -489,12 +554,12 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
 
                   {/* JSON Preview */}
                   {formData.flow && Object.keys(formData.flow).length > 0 && (
-                    <div className="mt-6">
+                    <div className="mt-6 w-full max-w-full overflow-hidden">
                       <h4 className="font-medium mb-3 text-gray-800">
                         JSON Preview
                       </h4>
-                      <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-64 border border-gray-700">
-                        <pre className="text-green-400 text-xs font-mono whitespace-pre">
+                      <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-64 border border-gray-700 w-full max-w-full">
+                        <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap break-words">
                           {JSON.stringify(formData.flow, null, 2)}
                         </pre>
                       </div>
@@ -515,10 +580,13 @@ export function WorkflowCreate({ onSubmit, categories, loading }: WorkflowCreate
               Previous
             </Button>
             {currentStep < 4 ? (
-              <Button onClick={() => setCurrentStep(currentStep + 1)}>Next</Button>
+              <Button onClick={() => setCurrentStep(currentStep + 1)}>
+                Next
+              </Button>
             ) : (
               <Button onClick={handleSubmit} disabled={isPublishing}>
-                <Save className="h-4 w-4 mr-2" /> {isPublishing ? "Publishing..." : "Publish Workflow"}
+                <Save className="h-4 w-4 mr-2" />{" "}
+                {isPublishing ? "Publishing..." : "Publish Workflow"}
               </Button>
             )}
           </div>

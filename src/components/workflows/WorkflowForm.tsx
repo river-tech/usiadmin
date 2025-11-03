@@ -492,7 +492,7 @@ export function WorkflowForm({
                       htmlFor="price"
                       className="text-sm font-semibold text-gray-700"
                     >
-                      Price ($)
+                      Price (VND)
                     </label>
                     <Input
                       id="price"
@@ -526,6 +526,35 @@ export function WorkflowForm({
                     />
                   </div>
                 </div>
+                  <div className="space-y-2">
+                  <label className="font-medium bg-gray-300 px-2 py-1 rounded-lg w-fit text-sm text-gray-700 mb-1 block">
+                    Categories
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {allCategories.map((c) => {
+                      const selected = formData.category_ids.includes(c.id);
+                      return (
+                        <Button
+                          key={c.id}
+                          variant={selected ? "default" : "outline"}
+                          className={`text-sm px-3 py-1 rounded-full ${
+                            selected ? "bg-pink-500 text-white" : "border-pink-300 text-gray-700"
+                          }`}
+                          onClick={() => {
+                            setFormData((prev) => ({
+                              ...prev,
+                              category_ids: selected
+                                ? prev.category_ids.filter((id) => id !== c.id)
+                                : [...prev.category_ids, c.id],
+                            }));
+                          }}
+                        >
+                          {c.name}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-700">
@@ -548,35 +577,7 @@ export function WorkflowForm({
                         </span>
                       )}
                     </div>
-                    {imagePreview.length > 0 ? (
-                      <div className="grid grid-cols-4 gap-2 mt-2">
-                        {imagePreview
-                          .slice(0, 4)
-                          .map((image: Asset, idx: number) => (
-                            <div key={idx} className="relative group">
-                              <img
-                                src={image.url}
-                                alt="Workflow asset"
-                                className="rounded-lg border shadow w-full h-20 object-cover"
-                              />
-                              <button
-                                type="button"
-                                className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
-                                onClick={() => {
-                                  // TODO: Add delete logic here
-                                  handleDeleteImage(image.id);
-                                }}
-                              >
-                                <X className="h-3 w-3" />
-                              </button>
-                            </div>
-                          ))}
-                      </div>
-                    ) : (
-                      <span className="text-gray-500 text-sm ml-2 mt-2">
-                        No image preview
-                      </span>
-                    )}
+                   
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-gray-700">
@@ -587,7 +588,7 @@ export function WorkflowForm({
                         id="video-upload"
                         type="file"
                         accept="video/*"
-                        disabled={isUploadingVideo}
+                        disabled={isUploadingVideo || !!formData.video_demo}
                         onChange={(e) =>
                           handleVideoUpload(e.target.files?.[0] as File)
                         }
@@ -600,41 +601,52 @@ export function WorkflowForm({
                       )}
                     </div>
                   </div>
+                  
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-700">
-                    Categories
-                  </label>
+                {imagePreview.length > 0 ? (
+                      <div className="grid grid-cols-4 gap-2 mt-2 w-full max-w-full overflow-hidden">
+                        {imagePreview
+                          .slice(0, 4)
+                          .map((image: Asset, idx: number) => (
+                            <div key={idx} className="relative group w-full overflow-hidden">
+                              <img
+                                src={image.url}
+                                alt="Workflow asset"
+                                className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                              />
+                              <button
+                                type="button"
+                                className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
+                                onClick={() => {
+                                  handleDeleteImage(image.id);
+                                }}
+                              >
+                                <X className="h-2 w-2" />
+                              </button>
+                            </div>
+                          ))}
+                      </div>
+                    ) : (
+                      <span className="text-gray-500 text-sm ml-2 mt-2">
+                        No image preview
+                      </span>
+                    )}
 
-                  {/* Wrapper để style đẹp hơn */}
-                  <div>
-                <label className="font-medium text-sm text-gray-700 mb-1 block">Categories</label>
-                <div className="flex flex-wrap gap-2">
-                  {allCategories.map((c) => {
-                    const selected = formData.category_ids.includes(c.id);
-                    return (
-                      <Button
-                        key={c.id}
-                        variant={selected ? "default" : "outline"}
-                        className={`text-sm px-3 py-1 rounded-full ${
-                          selected ? "bg-pink-500 text-white" : "border-pink-300 text-gray-700"
-                        }`}
-                        onClick={() => {
-                          setFormData((prev) => ({
-                            ...prev,
-                            category_ids: selected
-                              ? prev.category_ids.filter((id) => id !== c.id)
-                              : [...prev.category_ids, c.id],
-                          }));
-                        }}
-                      >
-                        {c.name}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-                </div>
+                    {
+                      formData?.video_demo && (
+                        <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
+                          <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
+                            Video preview:
+                          </span>
+                        <video
+                          className="rounded-lg border shadow max-h-32 max-w-full object-contain w-full"
+                            controls
+                            src={formData.video_demo}
+                          />
+                        </div>
+                      )
+                    }
+              
               </div>
             </TabsContent>
 
@@ -700,12 +712,12 @@ export function WorkflowForm({
 
                   {/* Assets Preview */}
                   {formData?.video_demo && (
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
                       <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
                         Video preview:
                       </span>
                       <video
-                        className="rounded-lg border shadow max-h-32 object-contain"
+                        className="rounded-lg border shadow max-h-32 max-w-full object-contain w-full"
                         controls
                         src={formData.video_demo}
                       />
@@ -713,31 +725,21 @@ export function WorkflowForm({
                   )}
 
                   {imagePreview && (
-                    <div className="flex flex-col items-start">
+                    <div className="flex flex-col items-start w-full max-w-full overflow-hidden">
                       <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold mb-2">
                         Image preview:
                       </span>
                       {imagePreview.length > 0 ? (
-                        <div className="grid grid-cols-4 gap-2 mt-2">
+                        <div className="grid grid-cols-4 gap-2 mt-2 w-full max-w-full overflow-hidden">
                           {imagePreview
                             .slice(0, 4)
                             .map((image: Asset, idx: number) => (
-                              <div key={idx} className="relative group">
+                              <div key={idx} className="relative group w-full overflow-hidden">
                                 <img
                                   src={image.url}
                                   alt="Workflow asset"
-                                  className="rounded-lg border shadow w-full h-20 object-cover"
+                                  className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
                                 />
-                                {/* <button
-                                    type="button"
-                                    className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 shadow-lg"
-                                    onClick={() => {
-                                      // TODO: Add delete logic here
-                                      console.log('Delete image at index:', idx);
-                                    }}
-                                  >
-                                    <X className="h-3 w-3" />
-                                  </button> */}
                               </div>
                             ))}
                         </div>
@@ -807,12 +809,12 @@ export function WorkflowForm({
 
                   {/* JSON Preview */}
                   {formData.flow && Object.keys(formData.flow).length > 0 && (
-                    <div className="mt-6">
+                    <div className="mt-6 w-full max-w-full overflow-hidden">
                       <h4 className="font-medium mb-3 text-gray-800">
                         JSON Preview
                       </h4>
-                      <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-64 border border-gray-700">
-                        <pre className="text-green-400 text-xs font-mono whitespace-pre">
+                      <div className="bg-gray-900 rounded-lg p-4 overflow-auto max-h-64 border border-gray-700 w-full max-w-full">
+                        <pre className="text-green-400 text-xs font-mono whitespace-pre-wrap break-words">
                           {JSON.stringify(formData.flow, null, 2)}
                         </pre>
                       </div>
