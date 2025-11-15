@@ -18,15 +18,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Download, Filter, Loader2 } from "lucide-react";
+import { MoreHorizontal, Eye, Filter, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { useAlert } from "@/contexts/AlertContext";
 import { useRouter } from "next/navigation";
 import { PurchaseListItem } from "@/lib/types";
 import { PurchaseStatus } from "@/lib/models";
 export function PurchaseTable({ list, isLoading }: { list: PurchaseListItem[], isLoading: boolean }) {
   const router = useRouter();
-  const { showSuccess, showError } = useAlert();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 

@@ -19,6 +19,7 @@ import type {
   WorkflowAsset,
 } from "@/lib/types";
 import { WorkflowStatus } from "@/lib/models";
+import { getErrorMessage } from "@/lib/utils";
 
 /* ===========================================================
    🧱 STATE
@@ -62,8 +63,8 @@ export const fetchAllWorkflows = createAsyncThunk(
       const result = await getAllWorkflows();
       if (!result?.success) return rejectWithValue(result?.error);
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error fetching workflows");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error fetching workflows"));
     }
   }
 );
@@ -78,8 +79,8 @@ export const fetchWorkflowOverview = createAsyncThunk(
       const result = await getWorkflowOverview();
       if (!result?.success) return rejectWithValue(result?.error);
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error fetching overview");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error fetching overview"));
     }
   }
 );
@@ -94,8 +95,8 @@ export const fetchWorkflowDetail = createAsyncThunk(
       console.log("result detail", result.data);
       if (!result?.success) return rejectWithValue(result?.error);
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error fetching workflow detail");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error fetching workflow detail"));
     }
   }
 );
@@ -109,8 +110,8 @@ export const createNewWorkflow = createAsyncThunk(
       const result = await createWorkflow(body);
       if (!result?.success) return rejectWithValue(result?.error);
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error creating workflow");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error creating workflow"));
     }
   }
 );
@@ -127,8 +128,8 @@ export const updateExistingWorkflow = createAsyncThunk(
       const result = await updateWorkflow(workflowId, body);
       if (!result?.success) return rejectWithValue(result?.error);
       return { id: workflowId, data: body };
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error updating workflow");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error updating workflow"));
     }
   }
 );
@@ -142,8 +143,8 @@ export const activateWorkflowById = createAsyncThunk(
       const result = await activateWorkflow(workflowId);
       if (!result?.success) return rejectWithValue(result?.error);
       return workflowId;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error activating workflow");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error activating workflow"));
     }
   }
 );
@@ -157,8 +158,8 @@ export const deactivateWorkflowById = createAsyncThunk(
       const result = await deactivateWorkflow(workflowId);
       if (!result?.success) return rejectWithValue(result?.error);
       return workflowId;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error deactivating workflow");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error deactivating workflow"));
     }
   }
 );
@@ -182,9 +183,9 @@ export const uploadAsset = createAsyncThunk(
           asset_id: result.data.asset_id,
           asset_url: result.data.asset_url,
         };
-      } catch (error: any) {
+      } catch (error) {
         console.error("Upload asset error:", error);
-        return rejectWithValue(error.message || "Failed to upload asset");
+        return rejectWithValue(getErrorMessage(error, "Failed to upload asset"));
       }
     }
   );
@@ -201,8 +202,8 @@ export const deleteAsset = createAsyncThunk(
       const result = await deleteWorkflowAsset(workflowId, assetId);
       if (!result?.success) return rejectWithValue(result?.error);
       return { workflowId, assetId };
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error deleting asset");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error deleting asset"));
     }
   }
 );
@@ -301,7 +302,7 @@ const workflowSlice = createSlice({
       
         if (state.selectedWorkflow && state.selectedWorkflow.id === workflowId) {
           state.selectedWorkflow.assets = state.selectedWorkflow.assets?.filter(
-            (a: any) => a.id !== assetId
+            (asset) => asset.id !== assetId
           );
         }
       })

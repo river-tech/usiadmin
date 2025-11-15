@@ -1,6 +1,5 @@
 import { StatCard } from "@/components/ui/StatCard";
 import { Users, UserCheck, ShoppingCart, DollarSign } from "lucide-react";
-import { mockUsers, mockAnalytics } from "@/lib/mock-data";
 import { formatCurrencyVND } from "@/lib/utils";
 import { UsersOverview } from "@/lib/types";
 

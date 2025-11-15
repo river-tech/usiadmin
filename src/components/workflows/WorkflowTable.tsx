@@ -28,7 +28,7 @@ import { useAlert } from "@/contexts/AlertContext";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
 import { fetchAllWorkflows } from "@/feature/workflowSlide";
-import { Workflow, WorkflowStatus } from "@/lib/models";
+import { WorkflowStatus } from "@/lib/models";
 import { formatCurrencyVND } from "@/lib/utils";
 import { deleteWorkflow ,activateWorkflow} from "@/api/workflow";
 
@@ -96,7 +96,7 @@ export function WorkflowTable() {
       } else {
         showError("Delete failed", result.error || "Could not delete workflow");
       }
-    } catch (error) {
+    } catch {
       showError("Error", "Failed to delete workflow");
     } finally {
       setDeleteDialog({ open: false, workflowId: null });

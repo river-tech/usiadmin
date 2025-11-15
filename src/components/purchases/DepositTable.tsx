@@ -1,19 +1,15 @@
 'use client'
-import { useSelector } from "react-redux";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrencyVND } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DepositResponse, DepositStatus } from "@/lib/types";
-import { Button } from "../ui/button";
 import { useState } from "react";
 import { CheckCircleIcon, XCircleIcon } from "lucide-react";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
-import { activateDeposit, rejectDeposit } from "@/api/deposit";
 import { createNotificationThunk } from "@/feature/notificationSlide";
 import { useAppDispatch } from "@/store/hooks";
 import { activateDepositThunk, rejectDepositThunk } from "@/feature/depositSlide";
 export function DepositTable({ list, isLoading }: { list: DepositResponse[], isLoading: boolean }) {
-  console.log(list);
   const dispatch = useAppDispatch();
   const [isShowConfirmModal, setIsShowConfirmModal] = useState(false);
   const [selectedDeposit, setSelectedDeposit] = useState<DepositResponse | null>(null);

@@ -18,14 +18,13 @@ import {
 import { formatDistanceToNow } from "date-fns";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useAlert } from "@/contexts/AlertContext";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "@/store";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchUserDetail,
   clearSelectedUser,
   selectSelectedUser,
 } from "@/feature/userSlide";
-import type { UserDetail, UserPurchase } from "@/lib/types";
+import type { UserPurchase } from "@/lib/types";
 import { formatCurrencyVND } from "@/lib/utils";
 
 // (Optional) You'd need a real API for purchase history if you want it live.
@@ -36,11 +35,10 @@ export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
   const { showError } = useAlert();
-  const dispatch: AppDispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const user = useSelector(selectSelectedUser);
-  const loading = useSelector((state: any) => state.users.isLoading);
-  const error = useSelector((state: any) => state.users.error);
+  const user = useAppSelector(selectSelectedUser);
+  const loading = useAppSelector((state) => state.users.isLoading);
 
   // For demo, simulate some purchase history if user is loaded.
   // Replace with actual user.purchase_history when integrated with the API.
@@ -61,7 +59,7 @@ export default function UserProfilePage() {
     const userId = params.id as string;
     dispatch(fetchUserDetail(userId))
       .unwrap()
-      .catch((err: any) => {
+      .catch(() => {
         showError("Error", "User not found!");
         router.push("/users");
       });
@@ -101,19 +99,18 @@ export default function UserProfilePage() {
       <PageHeader
         title="User Profile"
         description={`Viewing profile for ${user.name}`}
-        children={
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => router.back()}
-              className="hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 hover:shadow-sm"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </div>
-        }
-      />
+      >
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            className="hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 hover:shadow-sm"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* User Info Card */}
       <Card>
@@ -243,7 +240,7 @@ export default function UserProfilePage() {
               <ShoppingBag className="h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-semibold mb-2">No purchases found</h3>
               <p className="text-muted-foreground text-center">
-                This user hasn't made any purchases yet.
+                This user hasn&apos;t made any purchases yet.
               </p>
             </CardContent>
           </Card>

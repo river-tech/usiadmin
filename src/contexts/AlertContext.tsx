@@ -27,9 +27,16 @@ export function AlertProvider({ children }: { children: ReactNode }) {
     if (msg == null) return '';
     if (typeof msg === 'string') return msg;
     // try common error shapes
-    // @ts-ignore
-    const detail = (msg as any)?.detail || (msg as any)?.message || (msg as any)?.msg;
-    if (typeof detail === 'string') return detail;
+    if (typeof msg === 'object') {
+      const candidate = (msg as { detail?: unknown; message?: unknown; msg?: unknown });
+      const detail =
+        (typeof candidate.detail === 'string' && candidate.detail) ||
+        (typeof candidate.message === 'string' && candidate.message) ||
+        (typeof candidate.msg === 'string' && candidate.msg);
+      if (detail) {
+        return detail;
+      }
+    }
     try {
       return JSON.stringify(msg);
     } catch {

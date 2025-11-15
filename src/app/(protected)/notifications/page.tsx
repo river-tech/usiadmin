@@ -15,9 +15,6 @@ import {
   markNotificationReadThunk,
   deleteNotificationThunk,
   deleteAllNotificationsThunk,
-  selectNotifications,
-  selectUnreadNotificationCount,
-  selectNotificationLoading,
   broadcastNotificationThunk,
 } from "@/feature/notificationSlide";
 import { AdminNotification, AdminNotificationType } from "@/lib/types";
@@ -96,7 +93,7 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleMarkAsRead = async (notification: any) => {
+  const handleMarkAsRead = async (notification: AdminNotification) => {
     if (!notification.is_unread) return;
     try {
       await dispatch(markNotificationReadThunk(notification.id)).unwrap();
@@ -107,7 +104,7 @@ export default function NotificationsPage() {
     }
   };
 
-  const handleDismissNotification = async (notification: any) => {
+  const handleDismissNotification = async (notification: AdminNotification) => {
     try {
       await dispatch(deleteNotificationThunk(notification.id)).unwrap();
       showSuccess("Success", "Notification dismissed successfully!");
@@ -151,25 +148,24 @@ export default function NotificationsPage() {
       <PageHeader
         title="Notifications"
         description={`You have ${total} unread notifications`}
-        children={
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isLoading || list.length === 0}>
-              <Check className="h-4 w-4 mr-2" />
-              Mark All Read
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setShowDeleteAllConfirm(true)} 
-              disabled={isLoading || list.length === 0}
-              className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete All
-            </Button>
-          </div>
-        }
-      />
+      >
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleMarkAllRead} disabled={isLoading || list.length === 0}>
+            <Check className="h-4 w-4 mr-2" />
+            Mark All Read
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setShowDeleteAllConfirm(true)} 
+            disabled={isLoading || list.length === 0}
+            className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete All
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* Search and Filter */}
       <div className="flex items-center space-x-4">

@@ -1,6 +1,5 @@
 import {
   AdminNotification,
-  AdminNotificationsResponse,
   CreateNotificationBody,
   BroadcastNotificationBody,
   GenericSuccessResponse,
@@ -185,5 +184,4 @@ export const deleteAllNotifications = async (): Promise<GenericSuccessResponse &
     throw error;
   }
 };
-
 

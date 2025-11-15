@@ -5,17 +5,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Shield, Calendar, Edit, Save, X, User } from "lucide-react";
+import { Shield, Calendar, Edit, Save, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
 import { getCurrentUser, updateUserProfile, changePassword } from "@/feature/authSlice";
 import { useAlert } from "@/contexts/AlertContext";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function ProfilePage() {
   const dispatch = useAppDispatch();
-  const { user, isLoading } = useAppSelector((state: RootState) => state.auth);
+  const { user } = useAppSelector((state: RootState) => state.auth);
   const [profileData, setProfileData] = useState(user);
   const [isEditing, setIsEditing] = useState(false);
   const { showSuccess, showError } = useAlert();
@@ -36,8 +36,8 @@ export default function ProfilePage() {
       await dispatch(updateUserProfile({ name: profileData?.name || "" })).unwrap();
       showSuccess("Profile updated", "Your profile has been saved successfully.");
       setIsEditing(false);
-    } catch (e: any) {
-      showError("Update failed", e?.message || "Could not save your profile.");
+    } catch (error) {
+      showError("Update failed", getErrorMessage(error, "Could not save your profile."));
     }
   };
 
@@ -61,8 +61,8 @@ export default function ProfilePage() {
       setNewPassword("");
       setConfirmPassword("");
       setIsEditing(false);
-    } catch (e: any) {
-      showError("Change failed", e?.detail || "Could not change password.");
+    } catch (error) {
+      showError("Change failed", getErrorMessage(error, "Could not change password."));
     }
   };
 

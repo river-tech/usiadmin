@@ -6,6 +6,7 @@ import {
 } from "@/api/auth"; // hoặc "@/api/settings" nếu bạn tách file API riêng
 import type { RootState } from "@/store";
 import { Admin } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 // =============================
 // 🧱 STATE STRUCTURE
@@ -43,8 +44,8 @@ export const fetchAdmins = createAsyncThunk(
       const result = await getAllAdmins(token);
       if (!result?.success) return rejectWithValue(result?.error || "Failed to load admins");
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error fetching admins");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error fetching admins"));
     }
   }
 );
@@ -66,8 +67,8 @@ export const createAdmin = createAsyncThunk(
       const result = await createAdminAccount(token, name, email, password);
       if (!result?.success) return rejectWithValue(result?.error || "Failed to create admin");
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error creating admin");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error creating admin"));
     }
   }
 );
@@ -90,8 +91,8 @@ export const removeAdmin = createAsyncThunk(
       const result = await deleteAdminAccount(token, id, adminPassword);
       if (!result?.success) return rejectWithValue(result?.error || "Failed to delete admin");
       return id; // chỉ cần trả id để filter khỏi state
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Error deleting admin");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Error deleting admin"));
     }
   }
 );

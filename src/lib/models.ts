@@ -88,7 +88,7 @@ export interface Workflow {
   downloads_count: number;      // bigint [default: 0]
   time_to_setup: number;        // int
   video_demo: string;           // string
-  flow: Record<string, any>;    // jsonb - full JSON definition of the workflow
+  flow: Record<string, unknown>;    // jsonb - full JSON definition of the workflow
   rating_avg: number;           // numeric(3,2)
   created_at: string;           // timestamptz [default: `now()`]
   updated_at: string;           // timestamptz [default: `now()`]
@@ -250,7 +250,7 @@ export interface WorkflowFormData {
   categories: string[];
   time_to_setup: number;
   video_demo: string;
-  flow: Record<string, any>;
+  flow: Record<string, unknown>;
   category_ids: string[];
 }
 
@@ -367,4 +367,3 @@ export const Models = {
 
   
 } as const;
-

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { getCategories, postCategory, deleteCategory } from "@/api/workflow";
 import type { RootState } from "@/store";
 import { Category, CategoryBody } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 /* -----------------------------------
  🔹 STATE TYPE
@@ -34,8 +35,8 @@ export const fetchCategories = createAsyncThunk(
       console.log(result);
       if (result.success) return result.data as Category[];
       return rejectWithValue(result.error || "Failed to fetch categories");
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch categories");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch categories"));
     }
   }
 );
@@ -48,8 +49,8 @@ export const createCategory = createAsyncThunk(
       const result = await postCategory(payload);
       if (result.success) return result.data as Category;
       return rejectWithValue(result.error || "Failed to create category");
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to create category");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to create category"));
     }
   }
 );
@@ -62,8 +63,8 @@ export const removeCategory = createAsyncThunk(
       const result = await deleteCategory(categoryId);
       if (result.success) return categoryId;
       return rejectWithValue(result.error || "Failed to delete category");
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to delete category");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to delete category"));
     }
   }
 );

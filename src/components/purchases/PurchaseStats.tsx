@@ -1,6 +1,5 @@
 import { StatCard } from "@/components/ui/StatCard";
 import { ShoppingCart, CheckCircle, Clock, DollarSign } from "lucide-react";
-import { mockPurchases } from "@/lib/mock-data";
 import { PurchasesOverview } from "@/lib/types";
 import { formatCurrencyVND } from "@/lib/utils";
 

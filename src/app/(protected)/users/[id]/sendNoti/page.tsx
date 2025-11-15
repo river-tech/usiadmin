@@ -20,7 +20,6 @@ export default function SendNotiPage() {
   const router = useRouter();
   const params = useParams();
   const selectedUser = useAppSelector((state) => state.users.selectedUser);
-  const { success, error } = useAppSelector((state) => state.notification);
 
   useEffect(() => {
     dispatch(fetchUserDetail(params?.id as string));
@@ -32,7 +31,7 @@ export default function SendNotiPage() {
     // }
   }, [dispatch, params?.id]);
 
-  const { showSuccess, showError } = useAlert();
+  const { showSuccess } = useAlert();
   const [title, setTitle] = useState("");
   const [level, setLevel] = useState<AdminNotificationType | "">("");
   const [message, setMessage] = useState("");

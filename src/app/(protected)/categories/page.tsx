@@ -5,13 +5,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchCategories, createCategory, removeCategory, selectCategories } from "@/feature/categorSlice";
 import { useAlert } from "@/contexts/AlertContext";
 import { CategoryBody } from "@/lib/types";
 import { uploadToCloudinary } from "@/api/upload";
+import Image from "next/image";
+import { getErrorMessage } from "@/lib/utils";
 
 export default function CategoriesPage() {
   const dispatch = useAppDispatch();
@@ -50,8 +51,8 @@ export default function CategoriesPage() {
         setNewCategoryName("");
         setNewCategoryImage("");
       }
-    } catch (e: any) {
-      showError("Create failed", e?.message || "Could not create category");
+    } catch (error) {
+      showError("Create failed", getErrorMessage(error, "Could not create category"));
     }
   };
 
@@ -67,8 +68,8 @@ export default function CategoriesPage() {
       } else {
         showError("Upload failed", "No URL returned from upload");
       }
-    } catch (e: any) {
-      showError("Upload failed", e?.message || "Could not upload image");
+    } catch (error) {
+      showError("Upload failed", getErrorMessage(error, "Could not upload image"));
     } finally {
       setIsUploadingImage(false);
     }
@@ -80,8 +81,8 @@ export default function CategoriesPage() {
       if (result) {
         showSuccess("Category deleted", `"${categoryName}" has been deleted`);
       }
-    } catch (e: any) {
-      showError("Delete failed", e?.message || "Could not delete category");
+    } catch (error) {
+      showError("Delete failed", getErrorMessage(error, "Could not delete category"));
     }
   };
 
@@ -127,13 +128,16 @@ export default function CategoriesPage() {
                   <span className="text-xs text-pink-600">Uploading...</span>
                 )}
                 {imagePreview && !isUploadingImage && (
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="preview"
+                    width={40}
+                    height={40}
                     className="w-10 h-10 rounded-full object-cover border border-pink-200"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
+                    onError={(event) => {
+                      event.currentTarget.style.display = "none";
                     }}
+                    unoptimized
                   />
                 )}
               </div>
@@ -168,13 +172,16 @@ export default function CategoriesPage() {
                   className="flex flex-row items-center gap-4 border border-gray-100 rounded-lg p-4 bg-gradient-to-br from-blue-50/60 via-white to-pink-50/30 hover:border-blue-300 transition min-w-[260px] shadow-sm group"
                 >
                   {category.image_url && (
-                    <img
+                    <Image
                       src={category.image_url}
                       alt={category.name}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 object-cover rounded-full border border-blue-200 group-hover:border-blue-400 shadow-md"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
                       }}
+                      unoptimized
                     />
                   )}
                   <div className="flex flex-col flex-1 gap-2">
@@ -201,5 +208,4 @@ export default function CategoriesPage() {
     </div>
   );
 }
-
 

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/store";
 import { searchUsers, getUsersOverview, getUserDetail, banUser } from "@/api/user";
 import { UserSearchResponse, UsersOverview, UserDetail, BanUserBody } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 interface UsersState {
   list: UserSearchResponse[];
@@ -27,8 +28,8 @@ export const fetchUsers = createAsyncThunk(
       const result = await searchUsers();
       if (result.success) return result.data || [];
       return rejectWithValue(result.error || "Failed to search users");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to search users");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to search users"));
     }
   }
 );
@@ -41,8 +42,8 @@ export const fetchUsersOverview = createAsyncThunk(
       const result = await getUsersOverview();
       if (result.success) return result.data as UsersOverview;
       return rejectWithValue(result.error || "Failed to fetch users overview");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to fetch users overview");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch users overview"));
     }
   }
 );
@@ -55,8 +56,8 @@ export const fetchUserDetail = createAsyncThunk(
       const result = await getUserDetail(userId);
       if (result.success) return result.data as UserDetail;
       return rejectWithValue(result.error || "Failed to fetch user detail");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to fetch user detail");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch user detail"));
     }
   }
 );
@@ -72,8 +73,8 @@ export const updateUserBan = createAsyncThunk(
       const result = await banUser(payload.userId, payload.body);
       if (result.success) return { userId: payload.userId, body: payload.body };
       return rejectWithValue(result.error || "Failed to update user ban status");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to update user ban status");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to update user ban status"));
     }
   }
 );
@@ -93,7 +94,7 @@ const usersSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<any[]>) => {
+      .addCase(fetchUsers.fulfilled, (state, action: PayloadAction<UserSearchResponse[]>) => {
         state.isLoading = false;
         state.list = action.payload;
       })
@@ -160,5 +161,4 @@ export const selectUsersOverview = (state: RootState) => state.users.overview;
 export const selectSelectedUser = (state: RootState) => state.users.selectedUser;
 
 export default usersSlice.reducer;
-
 

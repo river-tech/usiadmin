@@ -11,8 +11,8 @@ import type {
   PurchaseListItem,
   PurchaseDetail,
   UpdatePurchaseStatusBody,
-  DepositResponse,
 } from '@/lib/types';
+import { getErrorMessage } from '@/lib/utils';
 
 interface PurchasesState {
   overview: PurchasesOverview | null;
@@ -42,8 +42,8 @@ export const fetchPurchasesOverview = createAsyncThunk(
       const result = await getPurchasesOverview();
       if (result.success) return result.data as PurchasesOverview;
       return rejectWithValue(result.error || 'Failed to get purchases overview');
-    } catch (e: any) {
-      return rejectWithValue(e?.message || 'Failed to get purchases overview');
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to get purchases overview'));
     }
   }
 );
@@ -56,8 +56,8 @@ export const fetchPurchasesList = createAsyncThunk(
       const result = await getPurchases();
       if (result.success) return result.data as PurchaseListItem[];
       return rejectWithValue(result.error || 'Failed to get purchases list');
-    } catch (e: any) {
-      return rejectWithValue(e?.message || 'Failed to get purchases list');
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to get purchases list'));
     }
   }
 );
@@ -70,8 +70,8 @@ export const fetchPurchaseDetail = createAsyncThunk(
       const result = await getPurchaseDetail(purchaseId);
       if (result.success) return result.data as PurchaseDetail;
       return rejectWithValue(result.error || 'Failed to get purchase detail');
-    } catch (e: any) {
-      return rejectWithValue(e?.message || 'Failed to get purchase detail');
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to get purchase detail'));
     }
   }
 );
@@ -87,8 +87,8 @@ export const updatePurchaseStatusThunk = createAsyncThunk(
       const result = await updatePurchaseStatus(payload.purchaseId, payload.body);
       if (result.success) return { purchaseId: payload.purchaseId, status: payload.body.status };
       return rejectWithValue(result.error || 'Failed to update purchase status');
-    } catch (e: any) {
-      return rejectWithValue(e?.message || 'Failed to update purchase status');
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, 'Failed to update purchase status'));
     }
   }
 );

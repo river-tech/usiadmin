@@ -226,7 +226,7 @@ export const changeAdminPassword = async (
   token: string,
   currentPassword: string,
   newPassword: string
-): Promise<{ success: boolean; data?: any; error?: string }> => {
+): Promise<{ success: boolean; data?: unknown; error?: string }> => {
   try {
     const response = await fetch(`${API_URL}/api/admin/settings/password`, {
       method: "PATCH",

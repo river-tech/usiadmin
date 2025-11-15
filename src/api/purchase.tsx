@@ -1,4 +1,4 @@
-import { PurchasesOverview, PurchaseListItem, PurchaseDetail, UpdatePurchaseStatusBody, ActivateDepositResponse, DepositResponse } from "@/lib/types";
+import { PurchasesOverview, PurchaseListItem, PurchaseDetail, UpdatePurchaseStatusBody } from "@/lib/types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -72,7 +72,7 @@ export const getPurchaseDetail = async (
 export const updatePurchaseStatus = async (
   purchaseId: string,
   body: UpdatePurchaseStatusBody
-): Promise<{ success: boolean; data?: any; error?: string }> => {
+): Promise<{ success: boolean; data?: unknown; error?: string }> => {
   try {
     const token = localStorage.getItem("token");
     const response = await fetch(`${API_URL}/api/admin/purchases/${purchaseId}/status`, {
@@ -89,5 +89,4 @@ export const updatePurchaseStatus = async (
     throw error;
   }
 };
-
 

@@ -9,8 +9,8 @@ import {
 import type {
   DepositResponse,
   OverviewDeposit,
-  DepositStatus,
 } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 interface DepositState {
   list: DepositResponse[];
@@ -37,8 +37,8 @@ export const fetchDepositList = createAsyncThunk(
       const result = await listAllDeposits();
       if (result.success) return result.data || [];
       return rejectWithValue(result.error || "Failed to fetch deposits");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to fetch deposits");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch deposits"));
     }
   }
 );
@@ -50,8 +50,8 @@ export const fetchDepositOverview = createAsyncThunk(
       const result = await getOverViewDeposit();
       if (result.success) return result.data as OverviewDeposit;
       return rejectWithValue(result.error || "Failed to fetch deposit overview");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to fetch deposit overview");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch deposit overview"));
     }
   }
 );
@@ -63,8 +63,8 @@ export const activateDepositThunk = createAsyncThunk(
       const result = await activateDeposit(transactionId);
       if (result.success) return transactionId;
       return rejectWithValue(result.error || "Failed to activate deposit");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to activate deposit");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to activate deposit"));
     }
   }
 );
@@ -76,8 +76,8 @@ export const rejectDepositThunk = createAsyncThunk(
       const result = await rejectDeposit(transactionId);
       if (result.success) return { transactionId };
       return rejectWithValue(result.error || "Failed to reject deposit");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to reject deposit");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to reject deposit"));
     }
   }
 );

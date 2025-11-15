@@ -9,7 +9,7 @@ import { fetchDepositList, fetchDepositOverview } from "@/feature/depositSlide";
 
 export default function DepositsPage() {
   const dispatch = useAppDispatch();
-  const { list, overview, isLoading, error, activateSuccess, rejectSuccess } = useAppSelector((state: RootState) => state.deposits);
+  const { list, overview, isLoading } = useAppSelector((state: RootState) => state.deposits);
   useEffect(() => {
     dispatch(fetchDepositList());
     dispatch(fetchDepositOverview());

@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
 import { login, getProfile, updateProfile, changeAdminPassword } from "@/api/auth";
 import type { RootState } from "@/store";
 import { Admin, AuthUser } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 interface AuthState {
   user: Admin | null;
@@ -43,9 +44,9 @@ export const loginUser = createAsyncThunk(
       console.log("🔑 Token field:", result.data?.token);
       
       return result.data;
-    } catch (error: any) {
+    } catch (error) {
       console.log("💥 Login error:", error);
-      return rejectWithValue(error.response?.data?.message || "Login failed");
+      return rejectWithValue(getErrorMessage(error, "Login failed"));
     }
   }
 );
@@ -67,8 +68,8 @@ export const getCurrentUser = createAsyncThunk(
       if (!result?.success) return rejectWithValue(result?.error || "Failed to load profile");
       console.log("🔄 getCurrentUser - result:", result);
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to get user data");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to get user data"));
     }
   }
 );
@@ -87,8 +88,8 @@ export const updateUserProfile = createAsyncThunk(
       if (!result?.success) return rejectWithValue(result?.error || "Update failed");
 
       return result.data;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to update user profile");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to update user profile"));
     }
   }
 );
@@ -103,8 +104,8 @@ export const changePassword = createAsyncThunk(
       if (!result?.success) return rejectWithValue(result?.error || "Failed to update password"); 
       return result.data;
     }
-    catch (error: any) {
-      return rejectWithValue(error.message || "Failed to update password");
+    catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to update password"));
     }
   }
 );
@@ -159,7 +160,7 @@ const authSlice = createSlice({
           localStorage.setItem(EXPIRY_KEY, String(Date.now() + EXPIRY_DURATION));
         }
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(loginUser.rejected, (state) => {
         state.isLoading = false;
         state.error = "Email or password is incorrect";
       });
@@ -170,14 +171,8 @@ const authSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getCurrentUser.fulfilled, (state, action: PayloadAction<Admin | undefined>) => {
-        console.log("🔄 getCurrentUser - resultttt:", action.payload);
         state.isLoading = false;
         state.user = action.payload || null;
-        console.log(`🔄 getCurrentUser - resultttt:${state.user}`);
-        console.log(`🔄 getCurrentUser - state.user:${state.user?.name}`);
-        console.log(`🔄 getCurrentUser - state.user:${state.user?.email}`);
-        console.log(`🔄 getCurrentUser - state.user:${state.user?.role}`);
-        console.log(`🔄 getCurrentUser - state.user:${state.user?.created_at}`);
       })
       .addCase(getCurrentUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -191,9 +186,11 @@ const authSlice = createSlice({
       .addCase(updateUserProfile.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(updateUserProfile.fulfilled, (state, action: PayloadAction<Partial<Admin> | undefined>) => {
         state.isLoading = false;
-        state.user = { ...state.user, ...action.payload };
+        if (action.payload) {
+          state.user = state.user ? { ...state.user, ...action.payload } : (action.payload as Admin);
+        }
       })
       .addCase(updateUserProfile.rejected, (state, action) => {
         state.isLoading = false;
@@ -204,7 +201,7 @@ const authSlice = createSlice({
       .addCase(changePassword.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(changePassword.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(changePassword.fulfilled, (state) => {
         state.isLoading = false;
       })
       .addCase(changePassword.rejected, (state, action) => {

@@ -5,10 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { UserPlus, Trash2, Key, Users, Shield, Ban } from "lucide-react";
+import { UserPlus, Trash2, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAlert } from "@/contexts/AlertContext";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -20,14 +19,14 @@ import { Admin } from "@/lib/types";
 export default function SettingsPage() {
   const { showSuccess, showError } = useAlert();
   const [users, setUsers] = useState<Admin[]>([]);
-  const { admins, isLoading, error, successMessage } = useAppSelector((state: RootState) => state.setting);
+  const { admins, error, successMessage } = useAppSelector((state: RootState) => state.setting);
   useEffect(() => {
     if (successMessage) {
       showSuccess("Success", successMessage);
     } else if (error) {
       showError("Error", error);
     }
-  }, [successMessage, error]);
+  }, [successMessage, error, showSuccess, showError]);
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(fetchAdmins());
@@ -45,7 +44,8 @@ export default function SettingsPage() {
   });
  
   const [deleteDialog, setDeleteDialog] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const selectedAdmin = selectedUser ? users.find((user) => user.id === selectedUser) : null;
   const [adminPassword, setAdminPassword] = useState("");
 
   const handleCreateAdmin = async () => {
@@ -59,7 +59,7 @@ export default function SettingsPage() {
       await dispatch(fetchAdmins())
       // showSuccess("Success", "Admin created successfully!");
       setNewAdmin({ name: "", email: "", password: "", confirmPassword: "" });
-    } catch (error: any) {
+    } catch {
       // showError("Error", "Failed to create admin!");
     }
   };
@@ -79,7 +79,7 @@ export default function SettingsPage() {
         setDeleteDialog(false);
         setSelectedUser(null);
         setAdminPassword("");
-      } catch (error) {
+      } catch {
         // showError("Error", "Failed to delete admin!");
       }
     } 
@@ -280,7 +280,8 @@ export default function SettingsPage() {
           <DialogHeader>
             <DialogTitle className="text-gray-900 text-lg font-semibold">Delete Admin Account</DialogTitle>
             <DialogDescription className="text-gray-600">
-              Are you sure you want to delete "{selectedUser?.name}"? This action cannot be undone.
+              Are you sure you want to delete{" "}
+              <span className="font-medium text-gray-900">{selectedAdmin?.name ?? "this admin"}</span>? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">

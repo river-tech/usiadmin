@@ -10,26 +10,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Upload, X, Plus, Save, Eye, CheckCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Upload, X, Save, CheckCircle } from "lucide-react";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { useAlert } from "@/contexts/AlertContext";
 import { Category, WorkflowBody } from "@/lib/types";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
+import Image from "next/image";
 import { selectCategories } from "@/feature/categorSlice";
 import { uploadToCloudinary } from "@/api/upload";
 
 interface WorkflowCreateProps {
   onSubmit: (formData: WorkflowBody, imagePreview: string[]) => void;
   categories?: Category[];
-  loading?: boolean;
 }
 
 export function WorkflowCreate({
   onSubmit,
   categories,
-  loading,
 }: WorkflowCreateProps) {
   const { showSuccess, showError } = useAlert();
   const categoryState = useAppSelector(selectCategories);
@@ -57,7 +56,7 @@ export function WorkflowCreate({
   const [isPublishing, setIsPublishing] = useState(false);
 
   // ✳️ Input handler
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = <K extends keyof WorkflowBody>(field: K, value: WorkflowBody[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -112,8 +111,8 @@ export function WorkflowCreate({
         setImagePreview((prev) => [...prev, upload.url]);
         showSuccess("Image uploaded", "Image asset uploaded successfully");
       }
-    } catch (e: any) {
-      showError("Upload failed", e.message || "Image upload failed");
+    } catch (error) {
+      showError("Upload failed", getErrorMessage(error, "Image upload failed"));
     }
     setIsUploadingImage(false);
   };
@@ -128,8 +127,8 @@ export function WorkflowCreate({
         setFormData((prev) => ({ ...prev, video_demo: upload.url }));
         showSuccess("Video uploaded", "Video uploaded successfully");
       }
-    } catch (e: any) {
-      showError("Upload failed", e.message || "Video upload failed");
+    } catch (error) {
+      showError("Upload failed", getErrorMessage(error, "Video upload failed"));
     } finally {
       setIsUploadingVideo(false);
     }
@@ -331,14 +330,14 @@ export function WorkflowCreate({
                 type="number"
                 placeholder="Price (VND)"
                 value={formData.price}
-                onChange={(e) => handleInputChange("price", e.target.value)}
+                onChange={(e) => handleInputChange("price", Number(e.target.value))}
               />
               <Input
                 type="number"
                 placeholder="Setup time (minutes)"
                 value={formData.time_to_setup}
                 onChange={(e) =>
-                  handleInputChange("time_to_setup", e.target.value)
+                  handleInputChange("time_to_setup", Number(e.target.value))
                 }
               />
               <div>
@@ -382,13 +381,19 @@ export function WorkflowCreate({
                   <Input
                     type="file"
                     accept="image/*"
-                    onChange={(e) => handleImageUpload(e.target.files?.[0]!)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                    }}
                     disabled={isUploadingImage || imagePreview.length >= 4}
                   />
                   <Input
                     type="file"
                     accept="video/*"
-                    onChange={(e) => handleVideoUpload(e.target.files?.[0]!)}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleVideoUpload(file);
+                    }}
                     disabled={isUploadingVideo || !!formData.video_demo}
                   />
                 </div>
@@ -409,10 +414,13 @@ export function WorkflowCreate({
                         key={idx}
                         className="relative group w-full overflow-hidden"
                       >
-                        <img
+                        <Image
                           src={image}
                           alt="Workflow asset"
+                          width={160}
+                          height={160}
                           className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                          unoptimized
                         />
                         <button
                           type="button"
@@ -536,10 +544,13 @@ export function WorkflowCreate({
                                 key={idx}
                                 className="relative group w-full overflow-hidden"
                               >
-                                <img
+                                <Image
                                   src={image}
                                   alt="Workflow asset"
+                                  width={160}
+                                  height={160}
                                   className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                                  unoptimized
                                 />
                               </div>
                             ))}

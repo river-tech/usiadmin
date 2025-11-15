@@ -7,12 +7,11 @@ import { useAppDispatch } from "@/store/hooks";
 import { useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
 import {  fetchPurchasesList, fetchPurchasesOverview } from "@/feature/purchaseSlide";
-import { PurchasesOverview } from "@/lib/types";
 
 
 export default function PurchasesPage() {
   const dispatch = useAppDispatch();
-  const { overview, list, detail, isLoading, error, updateStatusSuccess} = useAppSelector((state: RootState) => state.purchases);
+  const { overview, list, isLoading } = useAppSelector((state: RootState) => state.purchases);
   useEffect(() => {
     dispatch(fetchPurchasesOverview());
     dispatch(fetchPurchasesList());

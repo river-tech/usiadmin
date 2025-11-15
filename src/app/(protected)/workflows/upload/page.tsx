@@ -6,20 +6,18 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
 import { createNewWorkflow, uploadAsset } from "@/feature/workflowSlide";
 import { WorkflowCreate } from "@/components/workflows/WorkflowCreate";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { fetchCategories } from "@/feature/categorSlice";
 import { useRouter } from "next/navigation";
 export default function UploadWorkflowPage() {
-  const {showSuccess, showError} = useAlert();
+  const { showSuccess } = useAlert();
   const dispatch = useAppDispatch();
   const {categories} = useAppSelector((state: RootState) => state.categories);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
   useEffect(() => {
     dispatch(fetchCategories());
   }, [dispatch]);
   const handleSubmit = async (formData: WorkflowBody, imagePreview: string[]) => {
-    setLoading(true);
     const result = await dispatch(createNewWorkflow({ body: formData }));
     if (result) {
       for (const asset of imagePreview) {
@@ -33,7 +31,6 @@ export default function UploadWorkflowPage() {
     if (result) {
       router.push(`/workflows/${result.payload.id}/`);
     }
-    setLoading(false);
   };
   return (
     <div className="space-y-6">
@@ -41,7 +38,7 @@ export default function UploadWorkflowPage() {
         title="Upload Workflow"
         description="Create a new workflow automation template"
       />
-      <WorkflowCreate onSubmit={handleSubmit} categories={categories} loading={loading} />
+      <WorkflowCreate onSubmit={handleSubmit} categories={categories} />
     </div>
   );
 }

@@ -4,19 +4,18 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { WorkflowForm } from "@/components/workflows/WorkflowForm";
 import { Button } from "@/components/ui/button";
 import { useAlert } from "@/contexts/AlertContext";
-import { ArrowLeft, Trash2, Eye } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fetchWorkflowDetail,
-  deactivateWorkflowById,
   updateExistingWorkflow,
   selectWorkflow,
 } from "@/feature/workflowSlide";
 import { useEffect } from "react";
-import { Workflow, WorkflowBody } from "@/lib/types";
-import { fetchCategories, selectCategories } from "@/feature/categorSlice";
+import { WorkflowBody } from "@/lib/types";
+import { fetchCategories } from "@/feature/categorSlice";
 import { RootState } from "@/store";
 
 export default function EditWorkflowPage() {
@@ -104,7 +103,7 @@ export default function EditWorkflowPage() {
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold mb-2">Workflow not found</h2>
         <p className="text-muted-foreground mb-4">
-          The workflow you're trying to edit doesn’t exist.
+          The workflow you&apos;re trying to edit doesn&apos;t exist.
         </p>
         <Button asChild>
           <Link href="/workflows">
@@ -124,27 +123,22 @@ export default function EditWorkflowPage() {
       <PageHeader
         title="Edit Workflow"
         description={`Editing: ${workflow.title}`}
-        children={
-          <div className="flex gap-2">
-            <Button variant="outline" asChild>
-              <Link href="/workflows">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link href={`/workflows/${workflow.id}`}>
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Link>
-            </Button>
-            {/* <Button variant="destructive" onClick={handleDelete}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
-            </Button> */}
-          </div>
-        }
-      />
+      >
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/workflows">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href={`/workflows/${workflow.id}`}>
+              <Eye className="h-4 w-4 mr-2" />
+              Preview
+            </Link>
+          </Button>
+        </div>
+      </PageHeader>
 
       <WorkflowForm isEdit={true} initialData={workflow} onSubmit={handleSubmit} categories={categories} />
     </div>

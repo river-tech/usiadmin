@@ -13,7 +13,7 @@ export default function UsersPage() {
   const overview = useAppSelector(selectUsersOverview);
 
   useEffect(() => {
-    dispatch(fetchUsers(undefined as any));
+    dispatch(fetchUsers());
     dispatch(fetchUsersOverview());
   }, [dispatch]);
 
@@ -24,7 +24,12 @@ export default function UsersPage() {
         description="Manage user accounts and track user activity"
       />
 
-      <UserSummaryCard overview={overview} />
+      <UserSummaryCard overview={overview || {
+total_users: 0,
+active_users: 0,
+total_purchases: 0,
+total_spent: 0
+      }} />
       <UserTable users={users} />
     </div>
   );

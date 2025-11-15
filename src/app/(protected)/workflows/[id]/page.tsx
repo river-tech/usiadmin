@@ -10,18 +10,15 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchWorkflowDetail, deactivateWorkflowById } from "@/feature/workflowSlide";
 import { useAlert } from "@/contexts/AlertContext";
 import { formatDistanceToNow } from "date-fns";
-import { Edit, Trash2, Download, DollarSign, Play, Star, Users } from "lucide-react";
+import { Edit, Trash2, Download, DollarSign, Star, Users } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { RootState } from "@/store";
 import { WorkflowStatus } from "@/lib/models";
+import Image from "next/image";
 
-export default function WorkflowDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function WorkflowDetailPage() {
   const { id } = useParams();
   const router = useRouter();
   const dispatch = useAppDispatch();
@@ -36,11 +33,9 @@ export default function WorkflowDetailPage({
      Fetch detail when page mounts
   ------------------------------ */
   useEffect(() => {
-    console.log("workflowId", id);
-    if ( id) {
+    if (id) {
       dispatch(fetchWorkflowDetail({ workflowId: id.toString() }));
     }
-    console.log(selectedWorkflow);
   }, [dispatch, id]);
 
   /* -----------------------------
@@ -60,7 +55,7 @@ export default function WorkflowDetailPage({
       } else {
         showError("Delete failed", "Could not delete workflow");
       }
-    } catch (error) {
+    } catch {
       showError("Error", "Failed to delete workflow");
     } finally {
       setDeleteDialog(false);
@@ -68,7 +63,10 @@ export default function WorkflowDetailPage({
   };
 
   const handleDownloadJSON = () => {
-    const json = JSON.stringify(selectedWorkflow?.flow, null, 2);
+    if (!selectedWorkflow) {
+      return;
+    }
+    const json = JSON.stringify(selectedWorkflow.flow, null, 2);
     console.log(json);
     const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -96,7 +94,7 @@ export default function WorkflowDetailPage({
         <div className="text-center">
           <h2 className="text-2xl font-bold text-muted-foreground mb-2">Workflow Not Found</h2>
           <p className="text-muted-foreground mb-4">
-            The workflow you're looking for doesn't exist.
+            The workflow you&apos;re looking for doesn&apos;t exist.
           </p>
           <Link href="/workflows">
             <Button>Back to Workflows</Button>
@@ -114,21 +112,20 @@ export default function WorkflowDetailPage({
       <PageHeader
         title={selectedWorkflow.title}
         description={selectedWorkflow.description}
-        children={
-          <div className="flex gap-2">
-            <Link href={`/workflows/${selectedWorkflow.id}/edit`}>
-              <Button variant="outline">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            </Link>
-            <Button variant="outline" onClick={() => setDeleteDialog(true)}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete
+      >
+        <div className="flex gap-2">
+          <Link href={`/workflows/${selectedWorkflow.id}/edit`}>
+            <Button variant="outline">
+              <Edit className="h-4 w-4 mr-2" />
+              Edit
             </Button>
-          </div>
-        }
-      />
+          </Link>
+          <Button variant="outline" onClick={() => setDeleteDialog(true)}>
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete
+          </Button>
+        </div>
+      </PageHeader>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Main Content */}
@@ -150,15 +147,22 @@ export default function WorkflowDetailPage({
                   <label className="text-sm font-medium text-muted-foreground">Categories</label>
                   <div className="mt-1 flex flex-wrap gap-2">
                   {selectedWorkflow.categories?.length ? (
-  selectedWorkflow.categories.map((c: any, idx: number) => (
-    <Badge key={idx} variant="default">
-      {/* Nếu c là object => dùng c.name, còn nếu là string => hiển thị trực tiếp */}
-      {typeof c === "object" ? c.name || "Unnamed" : c}
-    </Badge>
-  ))
-) : (
-  <span className="text-sm text-muted-foreground">No categories</span>
-)}
+                    (selectedWorkflow.categories as Array<string | { id?: string; name?: string }>).map(
+                      (category, idx) => {
+                        const label =
+                          typeof category === "object" && category !== null
+                            ? category.name || "Unnamed"
+                            : category;
+                        return (
+                          <Badge key={`${label}-${idx}`} variant="default">
+                            {label}
+                          </Badge>
+                        );
+                      }
+                    )
+                  ) : (
+                    <span className="text-sm text-muted-foreground">No categories</span>
+                  )}
                   </div>
                 </div>
 
@@ -245,9 +249,16 @@ export default function WorkflowDetailPage({
             <CardContent>
               {selectedWorkflow.assets?.length ? (
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {selectedWorkflow.assets.map((a, idx) => (
-                   <img key={idx} src={a.url} alt="asset" className="w-full h-40 object-cover rounded-lg border shadow" />
-
+                  {selectedWorkflow.assets.map((asset, idx) => (
+                    <Image
+                      key={`${asset.id}-${idx}`}
+                      src={asset.url}
+                      alt="asset"
+                      width={320}
+                      height={160}
+                      className="w-full h-40 object-cover rounded-lg border shadow"
+                      unoptimized
+                    />
                   ))}
                 </div>
               ) : (
@@ -325,10 +336,6 @@ export default function WorkflowDetailPage({
                 <Download className="h-4 w-4 mr-2" />
                 Download JSON
               </Button>
-              {/* <Button className="w-full" variant="outline">
-                <Play className="h-4 w-4 mr-2" />
-                Preview Workflow
-              </Button> */}
             </CardContent>
           </Card>
         </div>
@@ -339,7 +346,7 @@ export default function WorkflowDetailPage({
         open={deleteDialog}
         onOpenChange={setDeleteDialog}
         title="Delete Workflow"
-        description={`Are you sure you want to delete "${selectedWorkflow.title}"? This action cannot be undone.`}
+        description={`Are you sure you want to delete ${selectedWorkflow.title}? This action cannot be undone.`}
         confirmText="Delete"
         variant="destructive"
         onConfirm={confirmDelete}

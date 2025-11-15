@@ -1,8 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockAnalytics } from "@/lib/mock-data";
 
+type RevenuePoint = {
+  date: string;
+  revenue: number;
+};
+
 export function SalesChart() {
-  const chartData = mockAnalytics.revenueChart.slice(-7); // Last 7 days
+  const chartData: RevenuePoint[] = mockAnalytics.revenueChart.slice(-7); // Last 7 days
 
   return (
     <Card>
@@ -14,7 +19,7 @@ export function SalesChart() {
       </CardHeader>
       <CardContent>
         <div className="h-[300px] flex items-end justify-between space-x-2">
-          {chartData.map((item, index) => {
+          {chartData.map((item: RevenuePoint, index) => {
             const maxRevenue = Math.max(...chartData.map(d => d.revenue));
             const height = (item.revenue / maxRevenue) * 100;
             

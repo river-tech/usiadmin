@@ -14,7 +14,7 @@ class WebSocketClient {
   private reconnectAttemptsMap: Map<EndpointType, number> = new Map();
   private maxReconnectAttempts = 5;
   private reconnectTimeouts: Map<EndpointType, ReturnType<typeof setTimeout>> = new Map();
-  private listeners: Map<string, Set<(data: any) => void>> = new Map();
+  private listeners: Map<string, Set<(data: unknown) => void>> = new Map();
 
   constructor() {
     // Lấy URL cho websocket từ biến môi trường, fallback dùng API URL.
@@ -38,19 +38,21 @@ class WebSocketClient {
 
   // Khởi tạo websocket cho endpoint (admin/deposits hoặc notifications)
   public connect(endpoint: EndpointType = WebSocketEndpoint.ADMIN_DEPOSITS): boolean {
-    if (
-      this.wsMap.has(endpoint) &&
-      (
-        this.wsMap.get(endpoint)!.readyState === WebSocket.OPEN ||
-        this.wsMap.get(endpoint)!.readyState === WebSocket.CONNECTING
-      )
-    ) {
-      // Nếu đang mở hoặc đang connect rồi thì thôi, không connect lại
-      return true;
+    // Kiểm tra connection hiện tại
+    const existingWs = this.wsMap.get(endpoint);
+    if (existingWs) {
+      // Nếu đang mở hoặc đang connect thì giữ nguyên
+      if (existingWs.readyState === WebSocket.OPEN || existingWs.readyState === WebSocket.CONNECTING) {
+        return true;
+      }
+      // Nếu connection đã đóng hoặc lỗi thì cleanup và tạo mới
+      if (existingWs.readyState === WebSocket.CLOSED || existingWs.readyState === WebSocket.CLOSING) {
+        this.wsMap.delete(endpoint);
+      } else {
+        // Connection cũ còn tồn tại nhưng không ở trạng thái hợp lệ, disconnect trước
+        this.disconnect(endpoint);
+      }
     }
-
-    // Nếu có kết nối cũ thì đóng lại
-    if (this.wsMap.has(endpoint)) this.disconnect(endpoint);
 
     const token = this.getAuthToken();
     if (!token) {
@@ -77,13 +79,32 @@ class WebSocketClient {
       ws.onopen = () => {
         this.reconnectAttemptsMap.set(endpoint, 0);
         this.emit(`connected:${endpoint}`, undefined);
+        
+        // Setup heartbeat để giữ connection sống
+        // Ping mỗi 30 giây để tránh timeout
+        const heartbeatInterval = setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            try {
+              ws.send(JSON.stringify({ type: "ping" }));
+            } catch {
+              clearInterval(heartbeatInterval);
+            }
+          } else {
+            clearInterval(heartbeatInterval);
+          }
+        }, 30000);
+        
+        // Lưu interval để cleanup khi disconnect
+        ws.addEventListener('close', () => {
+          clearInterval(heartbeatInterval);
+        });
       };
 
       ws.onmessage = (event) => {
         let data;
         try {
           data = JSON.parse(event.data);
-        } catch (e) {
+        } catch {
           return;
         }
         // Emit đúng type (nếu có), mặc định là "message"
@@ -104,8 +125,22 @@ class WebSocketClient {
         if (event.code !== 1000 && at < this.maxReconnectAttempts) {
           this.reconnectAttemptsMap.set(endpoint, at + 1);
           const delay = Math.min(1000 * (at + 1), 5000); // Giới hạn max 5s
-          const timeout = setTimeout(() => this.connect(endpoint), delay);
+          const timeout = setTimeout(() => {
+            // Kiểm tra token trước khi reconnect
+            const token = this.getAuthToken();
+            if (token) {
+              this.connect(endpoint);
+            } else {
+              console.warn(`⚠️ No token found, skipping reconnect for ${endpoint}`);
+            }
+          }, delay);
           this.reconnectTimeouts.set(endpoint, timeout);
+        } else if (event.code !== 1000 && at >= this.maxReconnectAttempts) {
+          // Reset reconnect attempts sau 30 giây để có thể thử lại
+          setTimeout(() => {
+            this.reconnectAttemptsMap.set(endpoint, 0);
+            console.log(`🔄 Reset reconnect attempts for ${endpoint}`);
+          }, 30000);
         }
       };
 
@@ -114,7 +149,7 @@ class WebSocketClient {
       };
 
       return true;
-    } catch (error) {
+    } catch {
       return false;
     }
   }
@@ -142,14 +177,14 @@ class WebSocketClient {
   }
 
   // Gửi dữ liệu qua websocket (nếu cần thiết, chủ yếu phía admin chỉ recv)
-  public send(data: any, endpoint: EndpointType = WebSocketEndpoint.ADMIN_DEPOSITS): boolean {
+  public send(data: unknown, endpoint: EndpointType = WebSocketEndpoint.ADMIN_DEPOSITS): boolean {
     const ws = this.wsMap.get(endpoint);
     if (ws && ws.readyState === WebSocket.OPEN) {
       try {
         const payload = typeof data === "string" ? data : JSON.stringify(data);
         ws.send(payload);
         return true;
-      } catch (err) {
+      } catch {
         return false;
       }
     }
@@ -157,13 +192,13 @@ class WebSocketClient {
   }
 
   // Đăng ký sự kiện
-  public on(event: string, callback: (data: any) => void): void {
+  public on(event: string, callback: (data: unknown) => void): void {
     if (!this.listeners.has(event)) this.listeners.set(event, new Set());
     this.listeners.get(event)!.add(callback);
   }
 
   // Bỏ đăng ký sự kiện
-  public off(event: string, callback?: (data: any) => void): void {
+  public off(event: string, callback?: (data: unknown) => void): void {
     const set = this.listeners.get(event);
     if (!set) return;
     if (callback) {
@@ -174,13 +209,13 @@ class WebSocketClient {
   }
 
   // Kích hoạt các hàm callback đúng type
-  private emit(event: string, data: any): void {
+  private emit(event: string, data: unknown): void {
     const cbs = this.listeners.get(event);
     if (cbs) {
       cbs.forEach((cb) => {
         try {
           cb(data);
-        } catch (e) {
+        } catch {
           // Do nothing
         }
       });

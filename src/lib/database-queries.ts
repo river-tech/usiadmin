@@ -2,20 +2,7 @@
 // DATABASE QUERIES - UsITech Admin Portal
 // ===========================================
 
-import { 
-  User, 
-  Workflow, 
-  Purchase, 
-  Notification, 
-  UserWithStats, 
-  WorkflowWithStats, 
-  PurchaseWithDetails,
-  UserStats,
-  WorkflowStats,
-  PurchaseStats,
-  NotificationStats,
-  SearchFilters
-} from './models';
+import { SearchFilters } from './models';
 
 // ===========================================
 // USER QUERIES
@@ -571,4 +558,3 @@ export const DatabaseQueries = {
   CategoryQueries,
   ContactMessageQueries
 } as const;
-

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { useAlert } from "@/contexts/AlertContext";
 import { getWebSocketClient, WebSocketEndpoint } from "./client";
-import { addNewDeposit } from "@/feature/depositSlide";
+import { addNewDeposit, fetchDepositList } from "@/feature/depositSlide";
 import { fetchNotifications } from "@/feature/notificationSlide";
 import { fetchDepositOverview } from "@/feature/depositSlide";
 import { selectAuth } from "@/feature/authSlice";
@@ -43,6 +43,16 @@ interface NewDepositRequestMessage {
 }
 
 /**
+ * Interface cho wallet_update notification
+ */
+interface WalletUpdateMessage {
+  type: "wallet_update";
+  event: "deposit_verified";
+  amount: number;
+  user_email?: string | null;
+}
+
+/**
  * Custom hook để quản lý WebSocket connection cho admin deposits
  * Tự động connect/disconnect, xử lý alerts và cập nhật Redux state
  */
@@ -53,28 +63,68 @@ export function useAdminWebSocket() {
   const handlersRef = useRef<{
     handleDepositsConnected?: () => void;
     handleNotificationsConnected?: () => void;
-    handleNewDepositRequest?: (data: NewDepositRequestMessage) => void;
-    handleDepositsError?: (error: any) => void;
-    handleNotificationsError?: (error: any) => void;
-    handleDepositsDisconnected?: (data: any) => void;
-    handleNotificationsDisconnected?: (data: any) => void;
-    handleNotificationUpdate?: (data: any) => void;
+    handleNewDepositRequest?: (data: unknown) => void;
+    handleWalletUpdate?: (data: WalletUpdateMessage) => void;
+    handleDepositsError?: (error: unknown) => void;
+    handleNotificationsError?: (error: unknown) => void;
+    handleDepositsDisconnected?: (data: unknown) => void;
+    handleNotificationsDisconnected?: (data: unknown) => void;
+    handleNotificationUpdate?: (data: unknown) => void;
   }>({});
 
+  // Track previous token để detect token changes
+  const prevTokenRef = useRef<string | null>(null);
+
   useEffect(() => {
-    // Đợi auth state được initialize và có token
+    // Lấy token từ storage (đáng tin cậy hơn Redux state sau refresh)
+    const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    
+    // Nếu không có token trong storage, disconnect và return
+    if (!tokenFromStorage) {
+      const client = getWebSocketClient();
+      client.disconnect(WebSocketEndpoint.ADMIN_DEPOSITS);
+      client.disconnect(WebSocketEndpoint.ADMIN_NOTIFICATIONS);
+      prevTokenRef.current = null;
+      return;
+    }
+    
+    // Nếu có token trong storage nhưng Redux state chưa được restore (sau refresh)
+    // Vẫn tiếp tục connect, không cần đợi isAuthenticated
     if (!isAuthenticated || !token) {
+      // Chỉ log, không return - sẽ connect với token từ storage
+      console.log("🔄 Token found in storage but auth state not restored yet, connecting anyway...");
+    }
+    
+    // Nếu token thay đổi, disconnect cũ và reconnect với token mới
+    const tokenChanged = prevTokenRef.current !== null && prevTokenRef.current !== tokenFromStorage && tokenFromStorage;
+    if (tokenChanged) {
+      console.log("🔄 Token changed, reconnecting WebSocket...");
+      const client = getWebSocketClient();
+      // Disconnect cũ trước
+      client.disconnect(WebSocketEndpoint.ADMIN_DEPOSITS);
+      client.disconnect(WebSocketEndpoint.ADMIN_NOTIFICATIONS);
+    }
+
+    // Update previous token
+    prevTokenRef.current = tokenFromStorage;
+
+    if (!tokenFromStorage) {
+      console.log("⚠️ No token found, skipping WebSocket connection");
       return;
     }
 
-    // Delay nhỏ để đảm bảo token đã sẵn sàng
+    // Delay nhỏ để đảm bảo token đã sẵn sàng (lâu hơn nếu token vừa thay đổi hoặc sau refresh)
+    // Sau refresh, có thể cần đợi auth state được restore
+    const connectDelay = tokenChanged ? 500 : (tokenFromStorage && (!isAuthenticated || !token) ? 800 : 300);
+    const handlers = handlersRef.current;
     const connectTimer = setTimeout(() => {
-      const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      const currentToken = typeof window !== "undefined" ? localStorage.getItem("token") : null;
       
-      if (!tokenFromStorage) {
+      if (!currentToken) {
         console.log("⚠️ No token found, skipping WebSocket connection");
         return;
       }
+
 
       const client = getWebSocketClient();
 
@@ -86,6 +136,8 @@ export function useAdminWebSocket() {
         console.warn("⚠️ Failed to connect WebSocket");
         return;
       }
+      
+      console.log("🔄 WebSocket connection initiated after refresh");
 
       // Handler khi connected deposits
       handlersRef.current.handleDepositsConnected = () => {
@@ -98,24 +150,34 @@ export function useAdminWebSocket() {
       };
 
       // Handler khi nhận deposit request mới
-      handlersRef.current.handleNewDepositRequest = (data: NewDepositRequestMessage) => {
-        console.log("💰 New deposit request received:", data);
+      handlersRef.current.handleNewDepositRequest = (data: unknown) => {
+        const message = data as Partial<NewDepositRequestMessage> | null;
+        if (
+          !message ||
+          typeof message !== "object" ||
+          !message.transaction ||
+          !message.user
+        ) {
+          return;
+        }
+
+        console.log("💰 New deposit request received:", message);
 
         // Map transaction data sang DepositResponse format
         const deposit: DepositResponse = {
-          id: data.transaction.id,
-          user_id: data.user.id,
-          user_email: data.user.email,
-          amount: data.transaction.amount,
-          status: (data.transaction.status === "COMPLETED" || data.transaction.status === "SUCCESS" 
+          id: message.transaction.id,
+          user_id: message.user.id,
+          user_email: message.user.email,
+          amount: message.transaction.amount,
+          status: (message.transaction.status === "COMPLETED" || message.transaction.status === "SUCCESS" 
             ? "SUCCESS" 
-            : data.transaction.status === "REJECTED" || data.transaction.status === "FAILED"
+            : message.transaction.status === "REJECTED" || message.transaction.status === "FAILED"
             ? "FAILED"
             : "PENDING") as DepositStatus,
-          bank_name: data.transaction.bank_name,
-          bank_account: data.transaction.bank_account,
-          transfer_code: data.transaction.transfer_code,
-          created_at: data.transaction.created_at,
+          bank_name: message.transaction.bank_name,
+          bank_account: message.transaction.bank_account,
+          transfer_code: message.transaction.transfer_code,
+          created_at: message.transaction.created_at,
         };
 
         // Thêm deposit mới vào Redux store
@@ -131,75 +193,124 @@ export function useAdminWebSocket() {
         showAlert({
           type: "success",
           title: "New Deposit Request",
-          message: data.message || `User ${data.user.name} (${data.user.email}) đã yêu cầu nạp ${data.transaction.amount.toLocaleString("vi-VN")} VNĐ`,
+          message: message.message || `User ${message.user.name} (${message.user.email}) đã yêu cầu nạp ${message.transaction.amount.toLocaleString("vi-VN")} VNĐ`,
           duration: 6000,
         });
       };
 
       // Handler khi có lỗi deposits
-      handlersRef.current.handleDepositsError = (error: any) => {
-        console.error("❌ WebSocket deposits error:", error);
+      handlersRef.current.handleDepositsError = (error: unknown) => {
+        console.log("❌ WebSocket deposits error:", error);
       };
 
       // Handler khi có lỗi notifications
-      handlersRef.current.handleNotificationsError = (error: any) => {
-        console.error("❌ WebSocket notifications error:", error);
+      handlersRef.current.handleNotificationsError = (error: unknown) => {
+        console.log("❌ WebSocket notifications error:", error);
       };
 
       // Handler khi disconnect deposits
-      handlersRef.current.handleDepositsDisconnected = (data: any) => {
+      handlersRef.current.handleDepositsDisconnected = (data: unknown) => {
         console.log("🔌 WebSocket deposits disconnected:", data);
+        // Tự động reconnect nếu token vẫn còn và không phải manual disconnect
+        if ((data as { code?: number })?.code !== 1000) {
+          setTimeout(() => {
+            const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+            if (tokenFromStorage) {
+              console.log("🔄 Attempting to reconnect deposits WebSocket...");
+              const wsClient = getWebSocketClient();
+              wsClient.connect(WebSocketEndpoint.ADMIN_DEPOSITS);
+            }
+          }, 2000);
+        }
       };
 
       // Handler khi disconnect notifications
-      handlersRef.current.handleNotificationsDisconnected = (data: any) => {
+      handlersRef.current.handleNotificationsDisconnected = (data: unknown) => {
         console.log("🔌 WebSocket notifications disconnected:", data);
+        // Tự động reconnect nếu token vẫn còn và không phải manual disconnect
+        if ((data as { code?: number })?.code !== 1000) {
+          setTimeout(() => {
+            const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+            if (tokenFromStorage) {
+              console.log("🔄 Attempting to reconnect notifications WebSocket...");
+              const wsClient = getWebSocketClient();
+              wsClient.connect(WebSocketEndpoint.ADMIN_NOTIFICATIONS);
+            }
+          }, 2000);
+        }
       };
 
       // Handler khi nhận notification mới từ notifications endpoint
-      handlersRef.current.handleNotificationUpdate = (data: any) => {
+      handlersRef.current.handleNotificationUpdate = (data: unknown) => {
         console.log("🔔 New notification received:", data);
-        // Refresh notifications list
-        dispatch(fetchNotifications());
+        
+        // Xử lý wallet_update với event deposit_verified
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          "type" in data &&
+          "event" in data &&
+          data.type === "wallet_update" &&
+          data.event === "deposit_verified"
+        ) {
+          const walletUpdate = data as WalletUpdateMessage;
+          console.log("✅ Deposit verified notification received:", walletUpdate);
+          
+          // Refresh lại danh sách deposits để hiển thị cập nhật mới
+          dispatch(fetchDepositList());
+          dispatch(fetchDepositOverview());
+          
+          // Refresh notifications
+          dispatch(fetchNotifications());
+          
+          // Hiển thị alert
+          showAlert({
+            type: "success",
+            title: "Deposit Verified",
+            message: `Deposit ${walletUpdate.amount.toLocaleString("vi-VN")} VNĐ đã được xác minh`,
+            duration: 5000,
+          });
+        } else {
+          // Các notification khác chỉ refresh notifications list
+          dispatch(fetchNotifications());
+        }
       };
 
       // Đăng ký các event listeners cho deposits
-      if (handlersRef.current.handleDepositsConnected) {
-        client.on(`connected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlersRef.current.handleDepositsConnected);
+      if (handlers.handleDepositsConnected) {
+        client.on(`connected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlers.handleDepositsConnected);
       }
-      if (handlersRef.current.handleNewDepositRequest) {
-        client.on("new_deposit_request", handlersRef.current.handleNewDepositRequest);
+      if (handlers.handleNewDepositRequest) {
+        client.on("new_deposit_request", handlers.handleNewDepositRequest);
       }
-      if (handlersRef.current.handleDepositsError) {
-        client.on(`error:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlersRef.current.handleDepositsError);
+      if (handlers.handleDepositsError) {
+        client.on(`error:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlers.handleDepositsError);
       }
-      if (handlersRef.current.handleDepositsDisconnected) {
-        client.on(`disconnected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlersRef.current.handleDepositsDisconnected);
+      if (handlers.handleDepositsDisconnected) {
+        client.on(`disconnected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlers.handleDepositsDisconnected);
       }
 
       // Đăng ký các event listeners cho notifications
-      if (handlersRef.current.handleNotificationsConnected) {
-        client.on(`connected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlersRef.current.handleNotificationsConnected);
+      if (handlers.handleNotificationsConnected) {
+        client.on(`connected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationsConnected);
       }
-      if (handlersRef.current.handleNotificationUpdate) {
-        client.on(`message:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlersRef.current.handleNotificationUpdate);
+      if (handlers.handleNotificationUpdate) {
+        client.on(`message:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationUpdate);
       }
-      if (handlersRef.current.handleNotificationsError) {
-        client.on(`error:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlersRef.current.handleNotificationsError);
+      if (handlers.handleNotificationsError) {
+        client.on(`error:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationsError);
       }
-      if (handlersRef.current.handleNotificationsDisconnected) {
-        client.on(`disconnected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlersRef.current.handleNotificationsDisconnected);
+      if (handlers.handleNotificationsDisconnected) {
+        client.on(`disconnected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationsDisconnected);
       }
-    }, 300); // Delay 300ms để đảm bảo token đã sẵn sàng
+    }, connectDelay); // Delay để đảm bảo token đã sẵn sàng
 
     // Cleanup khi component unmount hoặc auth state thay đổi
     return () => {
       clearTimeout(connectTimer);
       
       const client = getWebSocketClient();
-      const handlers = handlersRef.current;
-      
-      // Remove deposits listeners
+      // Remove deposits listeners (chỉ remove listeners, không disconnect connection)
       if (handlers.handleDepositsConnected) {
         client.off(`connected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlers.handleDepositsConnected);
       }
@@ -213,7 +324,7 @@ export function useAdminWebSocket() {
         client.off(`disconnected:${WebSocketEndpoint.ADMIN_DEPOSITS}`, handlers.handleDepositsDisconnected);
       }
 
-      // Remove notifications listeners
+      // Remove notifications listeners (chỉ remove listeners, không disconnect connection)
       if (handlers.handleNotificationsConnected) {
         client.off(`connected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationsConnected);
       }
@@ -227,10 +338,17 @@ export function useAdminWebSocket() {
         client.off(`disconnected:${WebSocketEndpoint.ADMIN_NOTIFICATIONS}`, handlers.handleNotificationsDisconnected);
       }
       
-      // Disconnect cả 2 WebSocket khi unmount
-      client.disconnect(WebSocketEndpoint.ADMIN_DEPOSITS);
-      client.disconnect(WebSocketEndpoint.ADMIN_NOTIFICATIONS);
-      console.log("🔌 WebSocket disconnected (cleanup)");
+      // Chỉ disconnect khi thực sự mất auth (không có token trong storage)
+      // Không disconnect khi refresh trang (token vẫn còn trong storage)
+      const tokenStillExists = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      if ((!isAuthenticated || !token) && !tokenStillExists) {
+        client.disconnect(WebSocketEndpoint.ADMIN_DEPOSITS);
+        client.disconnect(WebSocketEndpoint.ADMIN_NOTIFICATIONS);
+        console.log("🔌 WebSocket disconnected (auth lost)");
+      } else {
+        // Khi refresh, chỉ remove listeners, connection sẽ được reconnect với listeners mới
+        console.log("🔄 WebSocket listeners removed (will reconnect on remount)");
+      }
     };
   }, [dispatch, showAlert, showError, isAuthenticated, token]);
 

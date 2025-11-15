@@ -13,13 +13,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Upload, X, Plus, Save, Eye, CheckCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getErrorMessage } from "@/lib/utils";
 import { useAlert } from "@/contexts/AlertContext";
 import { Asset, Category, Workflow, WorkflowBody } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { selectCategories } from "@/feature/categorSlice";
 import { uploadToCloudinary } from "@/api/upload";
 import { deleteAsset, uploadAsset } from "@/feature/workflowSlide";
+import Image from "next/image";
 
 interface WorkflowFormProps {
   isEdit?: boolean;
@@ -40,6 +41,13 @@ export function WorkflowForm({
   const allCategories: Category[] = categoryState?.categories?.length
     ? categoryState.categories
     : categories || [];
+  const categoryIdSource = (initialData?.categories as Array<string | Category> | undefined) || [];
+  const resolvedCategoryIds = categoryIdSource.map((category) =>
+    typeof category === "object" && category !== null && "id" in category
+      ? (category as Category).id
+      : String(category)
+  );
+
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<WorkflowBody>({
     title: initialData?.title || "",
@@ -50,9 +58,7 @@ export function WorkflowForm({
     video_demo: initialData?.video_demo || "",
     flow: initialData?.flow || {},
     // map initial categories (names) to ids if possible; otherwise leave empty
-    category_ids: (initialData?.categories || []).map((cat: any) =>
-      typeof cat === "object" && "id" in cat ? cat.id : cat
-    ),
+    category_ids: resolvedCategoryIds,
   });
 
   const [newFeature, setNewFeature] = useState("");
@@ -62,7 +68,7 @@ export function WorkflowForm({
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [isUploadingVideo, setIsUploadingVideo] = useState(false);
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = <K extends keyof WorkflowBody>(field: K, value: WorkflowBody[K]) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -106,7 +112,7 @@ export function WorkflowForm({
           } catch (error) {
             showError(
               "Error",
-              "Invalid JSON file. Please check the file format."
+              getErrorMessage(error, "Invalid JSON file. Please check the file format.")
             );
           }
         };
@@ -137,11 +143,11 @@ export function WorkflowForm({
           ]);
           showSuccess("Image uploaded", "Image asset has been uploaded");
         } else {
-          showError("Upload failed", result.error as string);
+          showError("Upload failed", result.error?.message || "Could not upload image");
         }
       }
-    } catch (e: any) {
-      showError("Upload failed", e?.message || "Could not upload image");
+    } catch (error) {
+      showError("Upload failed", getErrorMessage(error, "Could not upload image"));
     } finally {
       setIsUploadingImage(false);
     }
@@ -162,8 +168,8 @@ export function WorkflowForm({
         setFormData((prev) => ({ ...prev, video_demo: upload.url }));
         showSuccess("Video uploaded", "Video asset has been uploaded");
       }
-    } catch (e: any) {
-      showError("Upload failed", e?.message || "Could not upload video");
+    } catch (error) {
+      showError("Upload failed", getErrorMessage(error, "Could not upload video"));
     } finally {
       setIsUploadingVideo(false);
     }
@@ -230,11 +236,11 @@ export function WorkflowForm({
     const result = await dispatch(
       deleteAsset({ workflowId: initialData?.id || "", assetId: imageId })
     );
-    if (result) {
+    if (deleteAsset.fulfilled.match(result)) {
       setImagePreview((prev) => prev.filter((image) => image.id !== imageId));
       showSuccess("Image deleted", "Image asset has been deleted");
     } else {
-      showError("Delete failed", "Something went wrong");
+      showError("Delete failed", result.error?.message || "Something went wrong");
     }
   };
 
@@ -442,18 +448,8 @@ export function WorkflowForm({
                   </div>
                   {formData.features?.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {formData.features?.map((feature: any, idx: number) => {
-                        let displayName;
-                        if (typeof feature === "object" && feature !== null) {
-                          // Try to show a human-readable field, fallback to "Unnamed"
-                          displayName =
-                            feature.name ||
-                            feature.title ||
-                            feature.id ||
-                            "Unnamed";
-                        } else {
-                          displayName = feature;
-                        }
+                      {formData.features?.map((feature: string, idx: number) => {
+                        const displayName = feature;
                         return (
                           <Badge
                             key={idx}
@@ -462,17 +458,7 @@ export function WorkflowForm({
                             {displayName}
                             <X
                               className="h-3 w-3 cursor-pointer hover:text-red-500"
-                              onClick={() =>
-                                removeFeature(
-                                  typeof feature === "object" &&
-                                    feature !== null
-                                    ? feature.id ||
-                                        feature.name ||
-                                        feature.title ||
-                                        ""
-                                    : feature.toString()
-                                )
-                              }
+                              onClick={() => removeFeature(feature)}
                             />
                           </Badge>
                         );
@@ -498,9 +484,9 @@ export function WorkflowForm({
                       id="price"
                       type="number"
                       value={formData.price}
-                      onChange={(e) =>
-                        handleInputChange("price", e.target.value)
-                      }
+                        onChange={(e) =>
+                          handleInputChange("price", Number(e.target.value))
+                        }
                       placeholder="0.00"
                       step="0.01"
                       className="border-green-200 focus:border-green-400 focus:ring-green-100"
@@ -517,9 +503,9 @@ export function WorkflowForm({
                       id="timeToSetup"
                       type="number"
                       value={formData.time_to_setup}
-                      onChange={(e) =>
-                        handleInputChange("time_to_setup", e.target.value)
-                      }
+                        onChange={(e) =>
+                          handleInputChange("time_to_setup", Number(e.target.value))
+                        }
                       placeholder="30"
                       min="1"
                       className="border-purple-200 focus:border-purple-400 focus:ring-purple-100"
@@ -566,9 +552,10 @@ export function WorkflowForm({
                         type="file"
                         accept="image/*"
                         disabled={isUploadingImage || imagePreview.length >= 4}
-                        onChange={(e) =>
-                          handleImageUpload(e.target.files?.[0] as File)
-                        }
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
                         className="border-orange-200 focus:border-orange-400 focus:ring-orange-100"
                       />
                       {isUploadingImage && (
@@ -589,9 +576,10 @@ export function WorkflowForm({
                         type="file"
                         accept="video/*"
                         disabled={isUploadingVideo || !!formData.video_demo}
-                        onChange={(e) =>
-                          handleVideoUpload(e.target.files?.[0] as File)
-                        }
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleVideoUpload(file);
+                        }}
                         className="border-orange-200 focus:border-orange-400 focus:ring-orange-100"
                       />
                       {isUploadingVideo && (
@@ -609,10 +597,13 @@ export function WorkflowForm({
                           .slice(0, 4)
                           .map((image: Asset, idx: number) => (
                             <div key={idx} className="relative group w-full overflow-hidden">
-                              <img
+                              <Image
                                 src={image.url}
                                 alt="Workflow asset"
+                                width={160}
+                                height={160}
                                 className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                                unoptimized
                               />
                               <button
                                 type="button"
@@ -735,10 +726,13 @@ export function WorkflowForm({
                             .slice(0, 4)
                             .map((image: Asset, idx: number) => (
                               <div key={idx} className="relative group w-full overflow-hidden">
-                                <img
+                                <Image
                                   src={image.url}
                                   alt="Workflow asset"
+                                  width={160}
+                                  height={160}
                                   className="rounded-lg border shadow w-full h-20 object-cover max-w-full"
+                                  unoptimized
                                 />
                               </div>
                             ))}
@@ -750,63 +744,6 @@ export function WorkflowForm({
                       )}
                     </div>
                   )}
-                  {/* {
-                    initialData?.assets.find((asset: any) => asset.kind === "video") && (
-                      <div className="flex flex-col items-start">
-                        <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
-                          Video preview:
-                        </span>
-                        <video
-                          className="rounded-lg border shadow max-h-32 object-contain"
-                          controls
-                          src={initialData?.assets.find((asset: any) => asset.kind === "video")?.asset_url}
-                        />
-                      </div>
-                    )
-                  } */}
-                  {/* {Array.isArray((formData as any).assets) &&
-                    ((formData as any).assets.find((asset: any) => asset.kind === "image") ||
-                      (formData as any).assets.find((asset: any) => asset.kind === "video")) && (
-                      <div className="flex flex-wrap items-center gap-6 text-sm mt-2">
-                        {(formData as any).assets.find(
-                          (asset: any) => asset.kind === "image"
-                        ) && (
-                          <div className="flex flex-col items-start">
-                            <span className="px-2 py-1 rounded bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold mb-2">
-                              Image preview:
-                            </span>
-                            <img
-                              className="rounded-lg border shadow max-h-32 object-contain"
-                              src={
-                                (formData as any).assets.find(
-                                  (asset: any) => asset.kind === "image"
-                                )?.asset_url
-                              }
-                              alt="Workflow asset"
-                            />
-                          </div>
-                        )}
-                        {(formData as any).assets.find(
-                          (asset: any) => asset.kind === "video"
-                        ) && (
-                          <div className="flex flex-col items-start">
-                            <span className="px-2 py-1 rounded bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold mb-2">
-                              Video preview:
-                            </span>
-                            <video
-                              className="rounded-lg border shadow max-h-32 object-contain"
-                              controls
-                              src={
-                                (formData as any).assets.find(
-                                  (asset: any) => asset.kind === "video"
-                                )?.asset_url
-                              }
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )} */}
-
                   {/* JSON Preview */}
                   {formData.flow && Object.keys(formData.flow).length > 0 && (
                     <div className="mt-6 w-full max-w-full overflow-hidden">

@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 import { useAppSelector } from "@/store/hooks";
 import { RootState } from "@/store";
-import { DepositStatus } from "@/lib/types";
 
 const navigation = [
   {

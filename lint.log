@@ -1,0 +1,286 @@
+
+> myapp@0.1.0 lint
+> eslint
+
+
+/Users/admin/Documents/USITech/usiadmin/src/api/auth.tsx
+  229:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/api/notification.tsx
+  3:3  warning  'AdminNotificationsResponse' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/api/purchase.tsx
+   1:89   warning  'ActivateDepositResponse' is defined but never used  @typescript-eslint/no-unused-vars
+   1:114  warning  'DepositResponse' is defined but never used          @typescript-eslint/no-unused-vars
+  75:39   error    Unexpected any. Specify a different type             @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(auth)/login/page.tsx
+  8:18  warning  'Lock' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/categories/page.tsx
+    8:10  warning  'Badge' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   53:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   70:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   83:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  130:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  171:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/deposits/page.tsx
+  12:38  warning  'error' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  12:45  warning  'activateSuccess' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  12:62  warning  'rejectSuccess' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/notifications/page.tsx
+   18:3   warning  'selectNotifications' is defined but never used                                             @typescript-eslint/no-unused-vars
+   19:3   warning  'selectUnreadNotificationCount' is defined but never used                                   @typescript-eslint/no-unused-vars
+   20:3   warning  'selectNotificationLoading' is defined but never used                                       @typescript-eslint/no-unused-vars
+   99:49  error    Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  110:58  error    Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  154:9   error    Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/profile/page.tsx
+   8:10  warning  'PageHeader' is defined but never used          @typescript-eslint/no-unused-vars
+   9:43  warning  'User' is defined but never used                @typescript-eslint/no-unused-vars
+  18:17  warning  'isLoading' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  39:17  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  64:17  error    Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/purchases/page.tsx
+  10:10  warning  'PurchasesOverview' is defined but never used             @typescript-eslint/no-unused-vars
+  15:27  warning  'detail' is assigned a value but never used               @typescript-eslint/no-unused-vars
+  15:46  warning  'error' is assigned a value but never used                @typescript-eslint/no-unused-vars
+  15:53  warning  'updateStatusSuccess' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/settings/page.tsx
+    8:10  warning  'Badge' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+   11:28  warning  'Key' is defined but never used                                                                                                   @typescript-eslint/no-unused-vars
+   11:40  warning  'Shield' is defined but never used                                                                                                @typescript-eslint/no-unused-vars
+   11:48  warning  'Ban' is defined but never used                                                                                                   @typescript-eslint/no-unused-vars
+   23:19  warning  'isLoading' is assigned a value but never used                                                                                    @typescript-eslint/no-unused-vars
+   30:6   warning  React Hook useEffect has missing dependencies: 'showError' and 'showSuccess'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   48:52  error    Unexpected any. Specify a different type                                                                                          @typescript-eslint/no-explicit-any
+   62:14  warning  'error' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+   62:21  error    Unexpected any. Specify a different type                                                                                          @typescript-eslint/no-explicit-any
+   82:16  warning  'error' is defined but never used                                                                                                 @typescript-eslint/no-unused-vars
+  283:47  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                   react/no-unescaped-entities
+  283:68  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                   react/no-unescaped-entities
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/users/[id]/page.tsx
+   28:15  warning  'UserDetail' is defined but never used                                                      @typescript-eslint/no-unused-vars
+   42:39  error    Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   43:9   warning  'error' is assigned a value but never used                                                  @typescript-eslint/no-unused-vars
+   43:37  error    Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+   64:15  warning  'err' is defined but never used                                                             @typescript-eslint/no-unused-vars
+   64:20  error    Unexpected any. Specify a different type                                                    @typescript-eslint/no-explicit-any
+  104:9   error    Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+  246:31  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                             react/no-unescaped-entities
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/users/[id]/sendNoti/page.tsx
+  23:11  warning  'success' is assigned a value but never used    @typescript-eslint/no-unused-vars
+  23:20  warning  'error' is assigned a value but never used      @typescript-eslint/no-unused-vars
+  35:24  warning  'showError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/users/page.tsx
+  16:38  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/workflows/[id]/edit/page.tsx
+    7:21  warning  'Trash2' is defined but never used                                                          @typescript-eslint/no-unused-vars
+   13:3   warning  'deactivateWorkflowById' is defined but never used                                          @typescript-eslint/no-unused-vars
+   18:10  warning  'Workflow' is defined but never used                                                        @typescript-eslint/no-unused-vars
+   19:27  warning  'selectCategories' is defined but never used                                                @typescript-eslint/no-unused-vars
+  107:27  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                             react/no-unescaped-entities
+  127:9   error    Do not pass children as props. Instead, nest children between the opening and closing tags  react/no-children-prop
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/workflows/[id]/page.tsx
+   13:46  warning  'Play' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   21:3   warning  'params' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+   44:6   warning  React Hook useEffect has a missing dependency: 'selectedWorkflow'. Either include it or remove the dependency array                                                                                                                                                                      react-hooks/exhaustive-deps
+   63:14  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+   99:29  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+   99:50  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                          react/no-unescaped-entities
+  117:9   error    Do not pass children as props. Instead, nest children between the opening and closing tags                                                                                                                                                                                               react/no-children-prop
+  153:39  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  249:20  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/workflows/page.tsx
+  4:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  5:10  warning  'Upload' is defined but never used  @typescript-eslint/no-unused-vars
+  6:8   warning  'Link' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/(protected)/workflows/upload/page.tsx
+  13:23  warning  'showError' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/app/error/page.tsx
+  16:20  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/admin/Documents/USITech/usiadmin/src/components/layout/Header.tsx
+   3:10  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+   3:21  warning  'useState' is defined but never used   @typescript-eslint/no-unused-vars
+  15:16  warning  'Search' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/layout/Sidebar.tsx
+  24:10  warning  'DepositStatus' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/purchases/DepositTable.tsx
+   2:10  warning  'useSelector' is defined but never used      @typescript-eslint/no-unused-vars
+   7:10  warning  'Button' is defined but never used           @typescript-eslint/no-unused-vars
+  11:10  warning  'activateDeposit' is defined but never used  @typescript-eslint/no-unused-vars
+  11:27  warning  'rejectDeposit' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/purchases/PurchaseStats.tsx
+  3:10  warning  'mockPurchases' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/purchases/PurchaseTable.tsx
+  21:31  warning  'Download' is defined but never used              @typescript-eslint/no-unused-vars
+  29:11  warning  'showSuccess' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  29:24  warning  'showError' is assigned a value but never used    @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/users/UserSummaryCard.tsx
+  3:10  warning  'mockUsers' is defined but never used      @typescript-eslint/no-unused-vars
+  3:21  warning  'mockAnalytics' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/components/workflows/WorkflowCreate.tsx
+   13:29  warning  'TabsList' is defined but never used                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+   13:39  warning  'TabsTrigger' is defined but never used                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+   15:21  warning  'Plus' is defined but never used                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+   15:33  warning  'Eye' is defined but never used                                                                                                                                                                                                                                                          @typescript-eslint/no-unused-vars
+   19:10  warning  'useAppDispatch' is defined but never used                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+   32:3   warning  'loading' is defined but never used                                                                                                                                                                                                                                                      @typescript-eslint/no-unused-vars
+   60:52  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  115:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  131:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  385:56  error    Optional chain expressions can return undefined by design - using a non-null assertion is unsafe and wrong                                                                                                                                                                               @typescript-eslint/no-non-null-asserted-optional-chain
+  391:56  error    Optional chain expressions can return undefined by design - using a non-null assertion is unsafe and wrong                                                                                                                                                                               @typescript-eslint/no-non-null-asserted-optional-chain
+  412:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  539:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/admin/Documents/USITech/usiadmin/src/components/workflows/WorkflowForm.tsx
+   53:61  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+   65:52  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  106:20  warning  'error' is defined but never used                                                                                                                                                                                                                                                        @typescript-eslint/no-unused-vars
+  143:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  165:17  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  445:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                                                 @typescript-eslint/no-explicit-any
+  612:31  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  738:33  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/admin/Documents/USITech/usiadmin/src/components/workflows/WorkflowTable.tsx
+  31:10  warning  'Workflow' is defined but never used  @typescript-eslint/no-unused-vars
+  99:14  warning  'error' is defined but never used     @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/contexts/AlertContext.tsx
+  30:5   error  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  31:28  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  31:52  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  31:77  error  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/authSlice.tsx
+   46:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   70:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:19  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  162:44  warning  'action' is defined but never used        @typescript-eslint/no-unused-vars
+  194:75  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  207:50  warning  'action' is defined but never used        @typescript-eslint/no-unused-vars
+  207:72  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/categorSlice.tsx
+  37:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  65:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/depositSlide.tsx
+  12:3   warning  'DepositStatus' is defined but never used  @typescript-eslint/no-unused-vars
+  40:17  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  53:17  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  66:17  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+  79:17  error    Unexpected any. Specify a different type   @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/notificationSlide.tsx
+   47:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   63:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   78:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  134:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/purchaseSlide.tsx
+  14:3   warning  'DepositResponse' is defined but never used  @typescript-eslint/no-unused-vars
+  45:17  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  59:17  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  73:17  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  90:17  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/settingSlide.tsx
+  46:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  69:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  93:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/userSlide.tsx
+  30:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  58:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  96:68  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/feature/workflowSlide.tsx
+   65:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  112:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  204:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  304:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/lib/database-queries.ts
+   6:3  warning  'User' is defined but never used                 @typescript-eslint/no-unused-vars
+   7:3  warning  'Workflow' is defined but never used             @typescript-eslint/no-unused-vars
+   8:3  warning  'Purchase' is defined but never used             @typescript-eslint/no-unused-vars
+   9:3  warning  'Notification' is defined but never used         @typescript-eslint/no-unused-vars
+  10:3  warning  'UserWithStats' is defined but never used        @typescript-eslint/no-unused-vars
+  11:3  warning  'WorkflowWithStats' is defined but never used    @typescript-eslint/no-unused-vars
+  12:3  warning  'PurchaseWithDetails' is defined but never used  @typescript-eslint/no-unused-vars
+  13:3  warning  'UserStats' is defined but never used            @typescript-eslint/no-unused-vars
+  14:3  warning  'WorkflowStats' is defined but never used        @typescript-eslint/no-unused-vars
+  15:3  warning  'PurchaseStats' is defined but never used        @typescript-eslint/no-unused-vars
+  16:3  warning  'NotificationStats' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/lib/models.ts
+   91:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  253:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/lib/types.ts
+  37:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/admin/Documents/USITech/usiadmin/src/socket/client.ts
+   17:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   89:22  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  107:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+  152:14  warning  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  180:21  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  187:16  warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  195:45  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  201:47  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  212:37  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:18  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+/Users/admin/Documents/USITech/usiadmin/src/socket/hook.ts
+   68:35  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   69:40  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   70:41  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   71:46  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+   72:39  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  191:57  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  196:62  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  201:63  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  217:68  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  233:61  error    Unexpected any. Specify a different type                                                                                                                                                                                                                               @typescript-eslint/no-explicit-any
+  294:36  warning  The ref value 'handlersRef.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'handlersRef.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+
+✖ 197 problems (102 errors, 95 warnings)
+

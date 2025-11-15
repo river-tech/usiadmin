@@ -14,6 +14,7 @@ import type {
   CreateNotificationBody,
   BroadcastNotificationBody,
 } from "@/lib/types";
+import { getErrorMessage } from "@/lib/utils";
 
 interface NotificationsState {
   list: AdminNotification[];
@@ -44,8 +45,8 @@ export const fetchNotifications = createAsyncThunk(
         return result.data;
       }
       return rejectWithValue(result.error || "Failed to fetch notifications");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to fetch notifications");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to fetch notifications"));
     }
   }
 );
@@ -60,9 +61,9 @@ export const createNotificationThunk = createAsyncThunk(
       console.log(result);
       if (result.success) return result;
       return rejectWithValue(result.message || "Failed to create notification");
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
-      return rejectWithValue(error?.message || "Failed to create notification");
+      return rejectWithValue(getErrorMessage(error, "Failed to create notification"));
     }
   }
 );
@@ -75,8 +76,8 @@ export const broadcastNotificationThunk = createAsyncThunk(
       const result = await broadcastNotification(body);
       if (result.success) return result;
       return rejectWithValue(result.message || "Failed to broadcast notification");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to broadcast notification");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to broadcast notification"));
     }
   }
 );
@@ -89,8 +90,8 @@ export const markNotificationReadThunk = createAsyncThunk(
       const result = await markNotificationAsRead(notificationId);
       if (result.success) return { notificationId };
       return rejectWithValue(result.message || "Failed to mark notification as read");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to mark notification as read");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to mark notification as read"));
     }
   }
 );
@@ -103,8 +104,8 @@ export const markAllNotificationsReadThunk = createAsyncThunk(
       const result = await markAllNotificationsAsRead();
       if (result.success) return result;
       return rejectWithValue(result.message || "Failed to mark all notifications as read");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to mark all notifications as read");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to mark all notifications as read"));
     }
   }
 );
@@ -117,8 +118,8 @@ export const deleteNotificationThunk = createAsyncThunk(
       const result = await deleteNotification(notificationId);
       if (result.success) return { notificationId };
       return rejectWithValue(result.message || "Failed to delete notification");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to delete notification");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to delete notification"));
     }
   }
 );
@@ -131,8 +132,8 @@ export const deleteAllNotificationsThunk = createAsyncThunk(
       const result = await deleteAllNotifications();
       if (result.success) return result;
       return rejectWithValue(result.message || "Failed to delete all notifications");
-    } catch (e: any) {
-      return rejectWithValue(e?.message || "Failed to delete all notifications");
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error, "Failed to delete all notifications"));
     }
   }
 );

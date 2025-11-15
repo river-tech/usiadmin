@@ -34,7 +34,7 @@ export interface Workflow {
   features: string[];
   time_to_setup: number;
   video_demo: string;
-  flow: Record<string, any>;
+  flow: Record<string, unknown>;
   categories: string[];
   sales_count: number;
   created_at: string;
@@ -64,7 +64,7 @@ export interface WorkflowBody{
     features: string[];
     time_to_setup: number;
     video_demo: string;
-    flow: Record<string, any>;
+    flow: Record<string, unknown>;
     category_ids: string[];
 }
 
@@ -261,27 +261,119 @@ export interface OverviewDeposit{
   rejected: number;
 }
 
-// WebSocket types
-export interface WebSocketDepositMessage {
-  type: "new_deposit_request" | "connected" | "error";
-  event?: string;
-  transaction?: {
+export type UserStatus = 'active' | 'inactive' | 'banned';
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+  joinDate: string;
+  purchases: number;
+  totalSpent: number;
+  status: UserStatus;
+  is_banned: boolean;
+}
+
+export type MockPurchaseStatus = 'ACTIVE' | 'PENDING' | 'REJECT';
+export interface Purchase {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  workflowId: string;
+  workflowTitle: string;
+  amount: number;
+  date: string;
+  paymentMethod: string;
+  status: MockPurchaseStatus;
+  transactionId: string;
+}
+
+export interface Activity {
+  id: string;
+  admin: string;
+  action: string;
+  target: string;
+  timestamp: string;
+  details?: string;
+}
+
+export interface MockWorkflow {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  sales: number;
+  revenue: number;
+  created: string;
+  updated: string;
+  status: WorkflowStatus;
+  categories: string[];
+  jsonData: string;
+  timeToSetup: number;
+  videoDemo: string;
+}
+
+export interface Analytics {
+  totalSales: number;
+  totalRevenue: number;
+  activeUsers: number;
+  totalUsers: number;
+  monthlyRevenue: number;
+  workflowCategories: {
+    category: string;
+    count: number;
+    revenue: number;
+  }[];
+  topWorkflows: {
     id: string;
-    status: string;
-    amount: number;
-    bank_name: string;
-    bank_account: string;
-    transfer_code: string;
-    created_at: string;
+    title: string;
+    sales: number;
+    revenue: number;
+  }[];
+  revenueChart: {
+    date: string;
+    revenue: number;
+  }[];
+}
+
+export interface StorageSettings {
+  maxFileSize: number;
+  allowedTypes: string[];
+  storageProvider: 'local' | 'aws' | 'gcp';
+  awsConfig?: {
+    bucket: string;
+    region: string;
+    accessKey: string;
   };
-  user?: {
-    id: string;
-    name: string;
-    email: string;
-  };
-  notification?: AdminNotification;
-  message?: string;
-  timestamp?: string;
+}
+
+export interface StripeSettings {
+  publishableKey: string;
+  secretKey: string;
+  webhookSecret: string;
+  enabled: boolean;
+}
+
+export interface MaintenanceSettings {
+  maintenanceMode: boolean;
+  maintenanceMessage: string;
+  allowedIPs: string[];
+}
+
+export interface NotificationSettings {
+  emailNotifications: boolean;
+  slackWebhook?: string;
+  discordWebhook?: string;
+  adminEmails: string[];
+}
+
+export interface Settings {
+  storage: StorageSettings;
+  stripe: StripeSettings;
+  maintenance: MaintenanceSettings;
+  notifications: NotificationSettings;
 }
 
 // // Workflow types
@@ -450,7 +542,7 @@ export interface WebSocketDepositMessage {
 //   key: keyof T;
 //   title: string;
 //   sortable?: boolean;
-//   render?: (value: any, item: T) => React.ReactNode;
+//   render?: (value: unknown, item: T) => React.ReactNode;
 // }
 
 // export interface PaginationProps {

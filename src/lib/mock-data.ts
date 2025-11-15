@@ -1,4 +1,5 @@
-import { User, Workflow, Purchase, Activity, Analytics, Settings } from './types';
+import { WorkflowStatus } from './models';
+import { User, MockWorkflow, Purchase, Activity, Analytics, Settings } from './types';
 
 // Mock Users
 export const mockUsers: User[] = [
@@ -10,7 +11,7 @@ export const mockUsers: User[] = [
     joinDate: '2024-01-15',
     purchases: 5,
     totalSpent: 299.95,
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     is_banned: false // Map to is_deleted: false = not banned
   },
   {
@@ -21,7 +22,7 @@ export const mockUsers: User[] = [
     joinDate: '2024-01-10',
     purchases: 3,
     totalSpent: 179.97,
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     is_banned: false // Map to is_deleted: false = not banned
   },
   {
@@ -32,7 +33,7 @@ export const mockUsers: User[] = [
     joinDate: '2024-01-05',
     purchases: 8,
     totalSpent: 479.92,
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     is_banned: false // Map to is_deleted: false = not banned
   },
   {
@@ -54,13 +55,13 @@ export const mockUsers: User[] = [
     joinDate: '2024-01-18',
     purchases: 1,
     totalSpent: 59.99,
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     is_banned: false // Map to is_deleted: false = not banned
   }
 ];
 
 // Mock Workflows
-export const mockWorkflows: Workflow[] = [
+export const mockWorkflows: MockWorkflow[] = [
   {
     id: '1',
     title: 'E-commerce Automation',
@@ -71,7 +72,7 @@ export const mockWorkflows: Workflow[] = [
     revenue: 4499.55,
     created: '2024-01-01',
     updated: '2024-01-15',
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     categories: ['automation', 'ecommerce', 'inventory'],
     jsonData: '{"steps": [{"id": 1, "name": "Inventory Check", "type": "condition"}, {"id": 2, "name": "Process Order", "type": "action"}]}',
     timeToSetup: 30,
@@ -87,7 +88,7 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2559.68,
     created: '2024-01-05',
     updated: '2024-01-18',
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     categories: ['social', 'automation', 'scheduling'],
     jsonData: '{"steps": [{"id": 1, "name": "Content Creation", "type": "action"}, {"id": 2, "name": "Schedule Post", "type": "action"}]}',
     timeToSetup: 45,
@@ -103,7 +104,7 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2699.82,
     created: '2024-01-08',
     updated: '2024-01-20',
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     categories: ['analytics', 'data', 'visualization'],
     jsonData: '{"steps": [{"id": 1, "name": "Data Collection", "type": "action"}, {"id": 2, "name": "Process Data", "type": "action"}]}',
     timeToSetup: 60,
@@ -119,7 +120,7 @@ export const mockWorkflows: Workflow[] = [
     revenue: 3249.75,
     created: '2024-01-12',
     updated: '2024-01-19',
-    status: 'active',
+    status: WorkflowStatus.ACTIVE,
     categories: ['ai', 'support', 'automation'],
     jsonData: '{"steps": [{"id": 1, "name": "Ticket Analysis", "type": "ai"}, {"id": 2, "name": "Generate Response", "type": "ai"}]}',
     timeToSetup: 90,
@@ -135,7 +136,7 @@ export const mockWorkflows: Workflow[] = [
     revenue: 2519.72,
     created: '2024-01-14',
     updated: '2024-01-20',
-    status: 'expired',
+    status: WorkflowStatus.EXPIRED,
     categories: ['email', 'marketing', 'automation'],
     jsonData: '{"steps": [{"id": 1, "name": "Segment Audience", "type": "action"}, {"id": 2, "name": "Send Email", "type": "action"}]}',
     timeToSetup: 20,
