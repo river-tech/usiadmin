@@ -6,8 +6,6 @@ import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { cn } from "@/lib/utils";
 import { useAdminWebSocket } from "@/socket/hook";
-import { useAppSelector } from "@/store/hooks";
-import { selectAuth } from "@/feature/authSlice";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -17,7 +15,6 @@ interface LayoutWrapperProps {
 export function LayoutWrapper({ children, className }: LayoutWrapperProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
-  const { isAuthenticated, token } = useAppSelector(selectAuth);
   
   // Kiểm tra auth và redirect về login nếu không có token
   useEffect(() => {
