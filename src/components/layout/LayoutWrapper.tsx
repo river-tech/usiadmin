@@ -1,10 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
 import { cn } from "@/lib/utils";
 import { useAdminWebSocket } from "@/socket/hook";
+import { useAppSelector } from "@/store/hooks";
+import { selectAuth } from "@/feature/authSlice";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -13,8 +16,26 @@ interface LayoutWrapperProps {
 
 export function LayoutWrapper({ children, className }: LayoutWrapperProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const router = useRouter();
+  const { isAuthenticated, token } = useAppSelector(selectAuth);
   
-  // Tự động connect WebSocket để nhận deposit requests mới
+  // Kiểm tra auth và redirect về login nếu không có token
+  useEffect(() => {
+    // Đợi một chút để Redux state có thể được restore sau refresh
+    const checkAuth = setTimeout(() => {
+      const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+      
+      // Chỉ redirect nếu thực sự không có token trong storage
+      // Nếu có token trong storage nhưng Redux chưa restore, vẫn cho phép (sẽ được restore sau)
+      if (!tokenFromStorage) {
+        router.push("/login");
+      }
+    }, 100);
+    
+    return () => clearTimeout(checkAuth);
+  }, [router]);
+  
+  // Tự động connect WebSocket để nhận deposit requests mới (chỉ khi có auth)
   useAdminWebSocket();
 
   return (

@@ -23,8 +23,12 @@ export default function LoginPage() {
   const { isLoading, error, isAuthenticated } = useAppSelector((state: RootState) => state.auth) as { isLoading: boolean; error: string | null; isAuthenticated: boolean };
   
   useEffect(() => {
-    if (isAuthenticated) {
-      router.push("/workflows"); // ✅ đổi thành route bạn muốn
+    // Kiểm tra token trong storage (đáng tin cậy hơn Redux state sau refresh)
+    const tokenFromStorage = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    
+    // Nếu đã có token trong storage hoặc Redux state authenticated, redirect về workflows
+    if (tokenFromStorage || isAuthenticated) {
+      router.push("/workflows");
     }
   }, [isAuthenticated, router]);
 
